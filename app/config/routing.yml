@@ -1,0 +1,4 @@
+z1:
+    resource: "@AcmeDemoBundle/Controller/"
+    type:     annotation
+    prefix:   /

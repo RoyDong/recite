@@ -1,0 +1,14 @@
+parameters:
+    database_driver: pdo_mysql
+    database_host: 192.168.11.50
+    database_port: null
+    database_name: roy_dev
+    database_user: root
+    database_password: '123456'
+    mailer_transport: smtp
+    mailer_host: 127.0.0.1
+    mailer_user: null
+    mailer_password: null
+    locale: en
+    secret: 4a41e103c6c67f7f3efd4d5e5ca31a3103
+    database_path: null
