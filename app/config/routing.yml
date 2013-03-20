@@ -1,4 +1,4 @@
-z1:
-    resource: "@AcmeDemoBundle/Controller/"
+recite_user:
+    resource: "@ReciteUserBundle/Controller/"
     type:     annotation
     prefix:   /
