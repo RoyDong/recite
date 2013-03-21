@@ -2,3 +2,14 @@ recite_user:
     resource: "@ReciteUserBundle/Controller/"
     type:     annotation
     prefix:   /
+
+login:
+    path: /login
+    defaults: {_controller: ReciteUserBundle:Security:login}
+
+login_check:
+    path: /login_check
+
+logout:
+    path: /logout
+

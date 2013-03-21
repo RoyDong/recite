@@ -6,10 +6,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * Acme\UserBundle\Entity\User
+ * Recite\UserBundle\Entity\User
  *
  * @ORM\Table(name="user")
- * @ORM\Entity(repositoryClass="Acme\UserBundle\Entity\UserRepository")
+ * @ORM\Entity(repositoryClass="Recite\UserBundle\Entity\UserRepository")
  */
 class User implements UserInterface
 {
@@ -156,5 +156,33 @@ class User implements UserInterface
     public function getEmail()
     {
         return $this->email;
+    }
+
+    /**
+     * @see \Serializable::serialize()
+     */
+    public function serialize()
+    {
+        return serialize(array(
+            $this->id,
+            $this->email,
+            $this->salt,
+            $this->password,
+            $this->username
+        ));
+    }
+
+    /**
+     * @see \Serializable::unserialize()
+     */
+    public function unserialize($serialized)
+    {
+        list (
+            $this->id,
+            $this->email,
+            $this->salt,
+            $this->password,
+            $this->username
+        ) = unserialize($serialized);
     }
 }

@@ -4,18 +4,25 @@ jms_security_extra:
 
 security:
     encoders:
-        Symfony\Component\Security\Core\User\User: plaintext
+        Symfony\Component\Security\Core\User\User:
+            algorithm:   sha512
+            iterations: 1
+            encode_as_base64: false
 
     role_hierarchy:
         ROLE_ADMIN:       ROLE_USER
-        ROLE_SUPER_ADMIN: [ROLE_USER, ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
+        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
 
     providers:
-        in_memory:
+        file:
             memory:
                 users:
-                    user:  { password: userpass, roles: [ 'ROLE_USER' ] }
-                    admin: { password: adminpass, roles: [ 'ROLE_ADMIN' ] }
+                    user: {password: whosyourdaddy, roles: [ROLE_USER]}
+
+        db:
+            entity:
+                class: Recite\UserBundle\Entity\User
+                property: email
 
     firewalls:
         dev:
@@ -23,17 +30,18 @@ security:
             security: false
 
         login:
-            pattern:  ^/demo/secured/login$
+            pattern:  ^/login$
             security: false
 
-        secured_area:
-            pattern:    ^/demo/secured/
+        main:
+            pattern:    .*
             form_login:
-                check_path: _security_check
-                login_path: _demo_login
+                check_path: /login_check
+                login_path: /login
+
             logout:
-                path:   _demo_logout
-                target: _demo
+                path:  /logout
+                target: /
             #anonymous: ~
             #http_basic:
             #    realm: "Secured Demo Area"
