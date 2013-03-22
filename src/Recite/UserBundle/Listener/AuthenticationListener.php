@@ -44,7 +44,7 @@ class AuthenticationListener implements AuthenticationSuccessHandlerInterface, A
     {
         //if ($request->isXmlHttpRequest()) {
             $result = array('success' => false, 'message' => $exception->getMessage());
-            $response = new Response(json_encode($result));
+            $response = new JsonResponse($result);
             $response->headers->set('Content-Type', 'application/json');
             return $response;
         //}
