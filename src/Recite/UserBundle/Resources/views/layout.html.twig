@@ -3,7 +3,6 @@
 {% block head %}
 {% endblock %}
 
-
 {% block body %}
     {% for flashMessage in app.session.flashbag.get('notice') %}
         <div class="flash-message">
@@ -11,6 +10,10 @@
         </div>
     {% endfor %}
 
+
+    <a href="{{ path('recite_user_main_index') }}">Index</a>
+    <a href="{{ path('login') }}">Login</a>
+    <a href="{{ path('logout') }}">Logout</a>
 
     <div class="block">
         {% block content %}{% endblock %}

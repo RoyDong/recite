@@ -7,10 +7,10 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 /**
- * @Route("/reg")
+ * @Route("/registration")
  * @Template()
  */
-class RegController extends Controller
+class RegistrationController extends Controller
 {
     /**
      * @Route("/{name}")
@@ -19,7 +19,7 @@ class RegController extends Controller
     public function indexAction($name)
     {
         if($this->get('request')->get('_f') == 'json'){
-            return $this->render('ReciteUserBundle:Reg:hello.json.twig', ['name' => $name]);
+            return $this->render('ReciteUserBundle:Registration:hello.json.twig', ['name' => $name]);
         }
 
         return array('name' => $name);
