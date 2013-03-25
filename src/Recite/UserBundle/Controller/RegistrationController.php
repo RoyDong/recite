@@ -2,7 +2,6 @@
 
 namespace Recite\UserBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
@@ -10,20 +9,14 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
  * @Route("/registration")
  * @Template()
  */
-class RegistrationController extends Controller
+class RegistrationController extends BaseController
 {
     /**
-     * @Route()
-     * @Template()
+     * @Route("/account")
+     * @Method({"post"})
      */
-    public function indexAction()
+    public function accountAction()
     {
-        $request = $this->get('request');
-
-        if($request->isMethod('post')){
-
-        }
-
         $user = $this->getUser();
 
         return ['name' => $user ? $user->getUsername() : 'annoymous'];

@@ -1,15 +1,15 @@
 <?php
 
-namespace Recite\UserBundle\Entity;
+namespace Recite\DataBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * Recite\UserBundle\Entity\User
+ * Recite\DataBundle\Entity\User
  *
  * @ORM\Table(name="user")
- * @ORM\Entity(repositoryClass="Recite\UserBundle\Entity\UserRepository")
+ * @ORM\Entity(repositoryClass="Recite\DataBundle\Entity\UserRepository")
  */
 class User implements UserInterface
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Recite\UserBundle\Entity;
+namespace Recite\DataBundle\Entity;
 
 use Doctrine\ORM\EntityRepository;
 

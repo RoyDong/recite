@@ -22,6 +22,7 @@ class AppKernel extends Kernel
 
             //Recite bundles
             new Recite\UserBundle\ReciteUserBundle(),
+            new Recite\DataBundle\ReciteDataBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {
