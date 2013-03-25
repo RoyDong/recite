@@ -13,15 +13,19 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 class RegistrationController extends Controller
 {
     /**
-     * @Route("/{name}")
+     * @Route()
      * @Template()
      */
-    public function indexAction($name)
+    public function indexAction()
     {
-        if($this->get('request')->get('_f') == 'json'){
-            return $this->render('ReciteUserBundle:Registration:hello.json.twig', ['name' => $name]);
+        $request = $this->get('request');
+
+        if($request->isMethod('post')){
+
         }
 
-        return array('name' => $name);
+        $user = $this->getUser();
+
+        return ['name' => $user ? $user->getUsername() : 'annoymous'];
     }
 }

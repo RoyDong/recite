@@ -163,13 +163,13 @@ class User implements UserInterface
      */
     public function serialize()
     {
-        return serialize(array(
+        return serialize([
             $this->id,
             $this->email,
             $this->salt,
             $this->password,
             $this->username
-        ));
+        ]);
     }
 
     /**
