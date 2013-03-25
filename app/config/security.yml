@@ -6,7 +6,7 @@ security:
     encoders:
         Symfony\Component\Security\Core\User\User: plaintext
 
-        Recite\UserBundle\Entity\User:
+        Recite\DataBundle\Entity\User:
             algorithm:   sha512
             iterations: 1
             encode_as_base64: false
@@ -23,7 +23,7 @@ security:
 
         db:
             entity:
-                class: Recite\UserBundle\Entity\User
+                class: Recite\DataBundle\Entity\User
                 property: email
 
     firewalls:
