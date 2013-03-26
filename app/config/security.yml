@@ -22,9 +22,11 @@ security:
                     user: {password: whosyourdaddy, roles: [ROLE_USER]}
 
         db:
-            entity:
-                class: Recite\DataBundle\Entity\User
-                property: email
+            entity: {class: Recite\DataBundle\Entity\User, property: email}
+
+        all:
+            chain:
+                providers: [file, db]
 
     firewalls:
         main:
@@ -34,6 +36,17 @@ security:
                 login_path: /login
                 success_handler: recite_authentication_listener
                 failure_handler: recite_authentication_listener
+                username_parameter: email
+                password_parameter: password
+
+            provider: all
+
+            remember_me:
+                key: "%secret%"
+                lifetime: 31536000 # 365 days in seconds
+                path: /
+                domain: ~ # Defaults to the current domain from $_SERVER
+                remember_me_parameter: remember_me
                 
             logout:
                 path:  /logout

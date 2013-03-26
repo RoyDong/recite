@@ -17,9 +17,15 @@ class MainController extends BaseController
      */
     public function indexAction()
     {
-
         $user = $this->getUser();
 
-        return ['name' => $user ? $user->getUsername() : 'annoymous'];
+        $a = $this->User->findOneByEmail('g@zuo.com');
+
+        ldd($a);
+
+        return [
+            'name' => $user ? $user->getUsername() : 'annoymous',
+            'roles' => $user ? $user->getRoles() : []
+        ];
     }
 }

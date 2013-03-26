@@ -25,6 +25,14 @@ class SecurityController extends BaseController
             $error = $session->get(SecurityContext::AUTHENTICATION_ERROR);
             $session->remove(SecurityContext::AUTHENTICATION_ERROR);
         }
+//
+//        $user = $this->getUser();
+//        $encoder = $this->get('security.encoder_factory')->getEncoder($user);
+//        $p = $encoder->encodePassword('111', $user->getSalt());
+//        $ps = $user->getPassword();
+//
+//        ldd($p, $ps);
+//
 
         return $this->render(
             'ReciteUserBundle:Security:login.html.twig',

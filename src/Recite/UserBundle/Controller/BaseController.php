@@ -4,7 +4,6 @@ namespace Recite\UserBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
-use Doctrine\ORM\EntityManager;
 
 class BaseController extends Controller
 {
@@ -21,12 +20,16 @@ class BaseController extends Controller
      * get doctrine manager
      * 
      * @param string $name
-     * @return EntityManager;
+     * @return Doctrine\ORM\EntityManager;
      */
     protected function em($name = null){
         return $this->get('doctrine')->getManager($name);
     }
 
+    /**
+     * @param array $data
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     protected function renderJson($data = null){
         if (is_array($data) && 0 === count($data)) {
             $data = new \ArrayObject();

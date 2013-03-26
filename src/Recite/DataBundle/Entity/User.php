@@ -4,6 +4,7 @@ namespace Recite\DataBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Recite\DataBundle\Entity\User
@@ -21,7 +22,7 @@ class User implements UserInterface
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=25, unique=true)
+     * @ORM\Column(type="string", length=25, nullable=true)
      */
     private $username;
 
@@ -31,7 +32,7 @@ class User implements UserInterface
     private $salt;
 
     /**
-     * @ORM\Column(type="string", length=40)
+     * @ORM\Column(type="string", length=128)
      */
     private $password;
 
@@ -41,9 +42,16 @@ class User implements UserInterface
     private $email;
 
 
+    /**
+     * @ORM\ManyToMany(targetEntity="Role", inversedBy="users")
+     * @ORM\JoinTable(name="user_role")
+     */
+    private $roles;
+
     public function __construct()
     {
         $this->salt = md5(uniqid(null, true));
+        $this->roles = new ArrayCollection();
     }
 
     /**
@@ -75,7 +83,13 @@ class User implements UserInterface
      */
     public function getRoles()
     {
-        return array('ROLE_USER');
+        $roles = [];
+
+        foreach($this->roles as $role){
+            $roles[] = $role->getRole();
+        }
+
+        return $roles;
     }
 
     /**
@@ -184,5 +198,28 @@ class User implements UserInterface
             $this->password,
             $this->username
         ) = unserialize($serialized);
+    }
+
+    /**
+     * Add roles
+     *
+     * @param \Recite\DataBundle\Entity\Role $roles
+     * @return User
+     */
+    public function addRole(\Recite\DataBundle\Entity\Role $roles)
+    {
+        $this->roles[] = $roles;
+    
+        return $this;
+    }
+
+    /**
+     * Remove roles
+     *
+     * @param \Recite\DataBundle\Entity\Role $roles
+     */
+    public function removeRole(\Recite\DataBundle\Entity\Role $roles)
+    {
+        $this->roles->removeElement($roles);
     }
 }

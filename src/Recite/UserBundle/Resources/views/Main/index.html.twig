@@ -4,4 +4,9 @@
 
 {{ name }}
 
+    {% if roles %}
+        {% for role in roles %}
+            <span>{{ role }}</span>
+        {% endfor %}
+    {% endif %}
 {% endblock %}

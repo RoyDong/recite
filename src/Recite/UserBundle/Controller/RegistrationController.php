@@ -5,6 +5,8 @@ namespace Recite\UserBundle\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Recite\DataBundle\Entity\User;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Http\RememberMe\TokenBasedRememberMeServices;
 
 /**
  * @Route("/registration")
@@ -19,24 +21,53 @@ class RegistrationController extends BaseController
     {
         $request = $this->get('request');
         $email = $request->get('email');
-        $user = $this->User->findOneByEmail($request->get('email'));
 
-        if($user){
+        if($this->User->isEmailExists($request->get('email'))){
             return $this->renderJson(['error' => 'Email is used']);
         }
 
-        $user = (new User)->setEmail($email);
+        $role = $this->Role->findOneByName('ROLE_USER');
+        $user = (new User)->setEmail($email)->setUsername($email)->addRole($role);
+        $this->em()->persist($user);
         $encoder = $this->get('security.encoder_factory')->getEncoder($user);
         $user->setPassword($encoder->encodePassword($request->get('password'), $user->getSalt()));
 
-        return $this->renderJson(['name' => '董炜<>"&\'']);
+        $this->em()->flush();
+        $this->login($user);
+        $response = $this->renderJson(['id' => $user->getId()]);
+
+        if($request->get('remember_me')){
+            $this->rememberMe($response);
+        }
+
+        return $response;
     }
 
-    private function login(){
+    private function login($user){
+        $token = new UsernamePasswordToken($user, null, 'main', $user->getRoles());
+        $this->get('security.context')->setToken($token);
 
+        return $token;
     }
 
-    private function rememberMe(){
+    private function rememberMe($response){
+        $container = $this->container;
+        $securityKey = $container->getParameter('secret');
+        $rememberMeService = new TokenBasedRememberMeServices(
+                [$this->User],
+                $securityKey,
+                'main',
+                [
+                    'path' => '/',
+                    'domain' => null,
+                    'name' => 'REMEMBERME',
+                    'lifetime' => null,
+                    'secure' => false,
+                    'httponly' => true,
+                    'always_remember_me' => true,
+                ]);
 
+        $rememberMeService->loginSuccess($this->get('request'), $response,
+                $this->get('security.context')->getToken());
     }
 }
