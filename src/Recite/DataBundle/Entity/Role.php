@@ -10,7 +10,7 @@ use Doctrine\Common\Collections\ArrayCollection;
  * Recite\DataBundle\Entity\Role
  *
  * @ORM\Table(name="role")
- * @ORM\Entity(repositoryClass="Recite\DataBundle\Entity\RoleRepository")
+ * @ORM\Entity(repositoryClass="Recite\DataBundle\Repository\RoleRepository")
  */
 class Role implements RoleInterface, \Serializable
 {

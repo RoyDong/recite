@@ -43,11 +43,4 @@ class SecurityController extends BaseController
             )
         );
     }
-
-    /**
-     * @Route("/logout")
-     */
-    public function logoutAction(){
-        $this->forward();
-    }
 }

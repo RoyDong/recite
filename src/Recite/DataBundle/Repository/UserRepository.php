@@ -1,6 +1,6 @@
 <?php
 
-namespace Recite\DataBundle\Entity;
+namespace Recite\DataBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Security\Core\User\UserProviderInterface;

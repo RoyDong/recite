@@ -51,20 +51,16 @@ class RegistrationController extends BaseController
     }
 
     private function rememberMe($response){
-        $container = $this->container;
-        $securityKey = $container->getParameter('secret');
         $rememberMeService = new TokenBasedRememberMeServices(
-                [$this->User],
-                $securityKey,
-                'main',
-                [
+                [$this->User], $this->container->getParameter('secret'),
+                'main', [
                     'path' => '/',
                     'domain' => null,
                     'name' => 'REMEMBERME',
-                    'lifetime' => null,
+                    'lifetime' => 31536000,
                     'secure' => false,
                     'httponly' => true,
-                    'always_remember_me' => true,
+                    'always_remember_me' => true
                 ]);
 
         $rememberMeService->loginSuccess($this->get('request'), $response,
