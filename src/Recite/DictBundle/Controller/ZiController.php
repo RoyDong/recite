@@ -29,6 +29,7 @@ class ZiController extends BaseController
             $records[] = [
                 'id' => $record->getId(),
                 'pinyin' => $record->getPinyin(),
+                'zhPinyin' => $record->getZhPinyin(),
                 'zh' => $record->getZh()
             ];
         }

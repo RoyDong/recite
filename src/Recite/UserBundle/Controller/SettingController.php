@@ -8,7 +8,7 @@ use Recite\DataBundle\Controller\BaseController;
 
 
 /**
- * @Route("/")
+ * @Route("/setting")
  */
 class SettingController extends BaseController
 {
@@ -19,10 +19,6 @@ class SettingController extends BaseController
     public function indexAction()
     {
         $user = $this->getUser();
-
-        $a = $this->User->findOneByEmail('g@zuo.com');
-
-        ldd($a);
 
         return [
             'name' => $user ? $user->getUsername() : 'annoymous',

@@ -12,6 +12,36 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class ZiRecord
 {
+
+    /**
+     * ā á ǎ à ē é ě è ī í ǐ ì ō ó ǒ ò ū ú ǔ ù ǖ ǘ ǚ ǜ ü ê ɑ  ń ń ň 
+     * 
+     * 
+     * @var array
+     */
+    private static $pinyins = [
+        'a1' => 'ā',
+        'a2' => 'á',
+        'a3' => 'ǎ',
+        'a4' => 'à',
+        'e1' => 'ē',
+        'e2' => 'é',
+        'e3' => 'ě',
+        'e4' => 'è',
+        'i1' => 'ī',
+        'i2' => 'í',
+        'i3' => 'ǐ',
+        'i4' => 'ì',
+        'o1' => 'ō',
+        'o2' => 'ó',
+        'o3' => 'ǒ',
+        'o4' => 'ò',
+        'v1' => 'ū',
+        'v2' => 'ú',
+        'v3' => 'ǔ',
+        'v4' => 'ù',
+    ];
+
     /**
      * @var integer
      *
@@ -77,6 +107,10 @@ class ZiRecord
     public function getPinyin()
     {
         return $this->pinyin;
+    }
+
+    public function getZhPinyin(){
+        return str_replace(array_keys(self::$pinyins), self::$pinyins, $this->pinyin);
     }
 
     /**

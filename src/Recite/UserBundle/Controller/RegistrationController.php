@@ -11,7 +11,6 @@ use Recite\DataBundle\Controller\BaseController;
 
 /**
  * @Route("/registration")
- * @Template()
  */
 class RegistrationController extends BaseController
 {
