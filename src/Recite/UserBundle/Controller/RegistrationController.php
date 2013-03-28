@@ -7,6 +7,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Recite\DataBundle\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Http\RememberMe\TokenBasedRememberMeServices;
+use Recite\DataBundle\Controller\BaseController;
 
 /**
  * @Route("/registration")

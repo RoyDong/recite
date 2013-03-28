@@ -5,6 +5,7 @@ namespace Recite\UserBundle\Controller;
 use Symfony\Component\Security\Core\SecurityContext;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Recite\DataBundle\Controller\BaseController;
 
 /**
  * @Route("/security")

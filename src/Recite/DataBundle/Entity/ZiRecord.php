@@ -21,13 +21,6 @@ class ZiRecord
      */
     private $id;
 
-
-    /**
-     *
-     * @ORM\Column(name="zid", type="integer")
-     */
-    private $zid;
-
     /**
      *
      * @ORM\Column(name="pinyin", type="string", length=10)
@@ -46,6 +39,13 @@ class ZiRecord
      */
     private $en;
 
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Zi")
+     * @ORM\JoinColumn(name="zid", referencedColumnName="id")
+     */
+    private $zi;
+
     /**
      * Get id
      *
@@ -54,29 +54,6 @@ class ZiRecord
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * Set zid
-     *
-     * @param integer $zid
-     * @return ZiRecord
-     */
-    public function setZid($zid)
-    {
-        $this->zid = $zid;
-    
-        return $this;
-    }
-
-    /**
-     * Get zid
-     *
-     * @return integer 
-     */
-    public function getZid()
-    {
-        return $this->zid;
     }
 
     /**
@@ -146,5 +123,28 @@ class ZiRecord
     public function getEn()
     {
         return $this->en;
+    }
+
+    /**
+     * Set zi
+     *
+     * @param \Recite\DataBundle\Entity\Zi $zi
+     * @return ZiRecord
+     */
+    public function setZi(\Recite\DataBundle\Entity\Zi $zi = null)
+    {
+        $this->zi = $zi;
+    
+        return $this;
+    }
+
+    /**
+     * Get zi
+     *
+     * @return \Recite\DataBundle\Entity\Zi 
+     */
+    public function getZi()
+    {
+        return $this->zi;
     }
 }

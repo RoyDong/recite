@@ -3,6 +3,7 @@
 namespace Recite\DataBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Zi
@@ -44,6 +45,15 @@ class Zi
      * @ORM\Column(name="stroke_count", type="smallint")
      */
     private $strokeCount;
+
+    /**
+     * @ORM\OneToMany(targetEntity="ZiRecord", mappedBy="zi")
+     */
+    private $records;
+
+    public function __construct() {
+        $this->records = new ArrayCollection;
+    }
 
     /**
      * Get id
@@ -145,5 +155,38 @@ class Zi
     public function getStrokeCount()
     {
         return $this->strokeCount;
+    }
+
+    /**
+     * Add records
+     *
+     * @param \Recite\DataBundle\Entity\ZiRecord $records
+     * @return Zi
+     */
+    public function addRecord(\Recite\DataBundle\Entity\ZiRecord $records)
+    {
+        $this->records[] = $records;
+    
+        return $this;
+    }
+
+    /**
+     * Remove records
+     *
+     * @param \Recite\DataBundle\Entity\ZiRecord $records
+     */
+    public function removeRecord(\Recite\DataBundle\Entity\ZiRecord $records)
+    {
+        $this->records->removeElement($records);
+    }
+
+    /**
+     * Get records
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getRecords()
+    {
+        return $this->records;
     }
 }

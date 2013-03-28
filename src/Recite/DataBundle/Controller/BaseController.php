@@ -1,6 +1,6 @@
 <?php
 
-namespace Recite\UserBundle\Controller;
+namespace Recite\DataBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
