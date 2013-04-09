@@ -20,7 +20,7 @@ class BaseController extends Controller
      * get doctrine manager
      * 
      * @param string $name
-     * @return Doctrine\ORM\EntityManager;
+     * @return Doctrine\ORM\EntityManager
      */
     protected function em($name = null){
         return $this->get('doctrine')->getManager($name);
@@ -35,13 +35,7 @@ class BaseController extends Controller
             $data = new \ArrayObject();
         }
 
-        // Encode  ', &, and " for RFC4627-compliant JSON, which may also be embedded into HTML.
-        if($data){
-            $json = json_encode($data, JSON_UNESCAPED_UNICODE );
-        }else{
-            $json = '';
-        }
-
+        $json = $data ? json_encode($data, JSON_UNESCAPED_UNICODE) : '';
         $response = new Response($json);
         $response->headers->set('Content-Type', 'application/json');
 

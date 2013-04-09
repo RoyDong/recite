@@ -1,10 +1,9 @@
 <?php
 
-namespace Recite\DictBundle\Controller;
+namespace Recite\MainBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Recite\DataBundle\Controller\BaseController;
 
 /**
@@ -25,12 +24,12 @@ class ZiController extends BaseController
 
         $records = [];
 
-        foreach($zi->getRecords() as $record){
+        foreach($zi->getZhs() as $zh){
             $records[] = [
-                'id' => $record->getId(),
-                'pinyin' => $record->getPinyin(),
-                'zhPinyin' => $record->getZhPinyin(),
-                'zh' => $record->getZh()
+                'id' => $zh->getId(),
+                'pinyin' => $zh->getPinyin(),
+                'zhPinyin' => $zh->getZhPinyin(),
+                'content' => $zh->getContent()
             ];
         }
 

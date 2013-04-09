@@ -13,6 +13,45 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 class Zi
 {
+    
+    /**
+     * ā á ǎ à ē é ě è ī í ǐ ì ō ó ǒ ò ū ú ǔ ù ǖ ǘ ǚ ǜ ü ê ɑ  ń ń ň 
+     * 
+     * 
+     * @var array
+     */
+    private static $pinyins = [
+        'a1' => 'ā',
+        'a2' => 'á',
+        'a3' => 'ǎ',
+        'a4' => 'à',
+
+        'e1' => 'ē',
+        'e2' => 'é',
+        'e3' => 'ě',
+        'e4' => 'è',
+
+        'i1' => 'ī',
+        'i2' => 'í',
+        'i3' => 'ǐ',
+        'i4' => 'ì',
+
+        'o1' => 'ō',
+        'o2' => 'ó',
+        'o3' => 'ǒ',
+        'o4' => 'ò',
+
+        'u1' => 'ū',
+        'u2' => 'ú',
+        'u3' => 'ǔ',
+        'u4' => 'ù',
+
+        'v1' => 'ǖ',
+        'v2' => 'ǘ',
+        'v3' => 'ǚ',
+        'v4' => 'ǜ',
+    ];
+
     /**
      * @var integer
      *
@@ -47,12 +86,18 @@ class Zi
     private $strokeCount;
 
     /**
-     * @ORM\OneToMany(targetEntity="ZiRecord", mappedBy="zi")
+     * @ORM\OneToMany(targetEntity="ZiZh", mappedBy="zi")
      */
-    private $records;
+    private $zhs;
+
+    /**
+     * @ORM\OneToMany(targetEntity="ZiEn", mappedBy="zi")
+     */
+    private $ens;
 
     public function __construct() {
-        $this->records = new ArrayCollection;
+        $this->zhs= new ArrayCollection;
+        $this->ens= new ArrayCollection;
     }
 
     /**
@@ -158,35 +203,86 @@ class Zi
     }
 
     /**
-     * Add records
+     * Add zhs
      *
-     * @param \Recite\DataBundle\Entity\ZiRecord $records
+     * @param \Recite\DataBundle\Entity\ZiZh $zhs
      * @return Zi
      */
-    public function addRecord(\Recite\DataBundle\Entity\ZiRecord $records)
+    public function addZh(\Recite\DataBundle\Entity\ZiZh $zhs)
     {
-        $this->records[] = $records;
+        $this->zhs[] = $zhs;
     
         return $this;
     }
 
     /**
-     * Remove records
+     * Remove zhs
      *
-     * @param \Recite\DataBundle\Entity\ZiRecord $records
+     * @param \Recite\DataBundle\Entity\ZiZh $zhs
      */
-    public function removeRecord(\Recite\DataBundle\Entity\ZiRecord $records)
+    public function removeZh(\Recite\DataBundle\Entity\ZiZh $zhs)
     {
-        $this->records->removeElement($records);
+        $this->zhs->removeElement($zhs);
     }
 
     /**
-     * Get records
+     * Get zhs
      *
      * @return \Doctrine\Common\Collections\Collection 
      */
-    public function getRecords()
+    public function getZhs()
     {
-        return $this->records;
+        return $this->zhs;
+    }
+
+    /**
+     * Add ens
+     *
+     * @param \Recite\DataBundle\Entity\ZiEn $ens
+     * @return Zi
+     */
+    public function addEn(\Recite\DataBundle\Entity\ZiEn $ens)
+    {
+        $this->ens[] = $ens;
+    
+        return $this;
+    }
+
+    /**
+     * Remove ens
+     *
+     * @param \Recite\DataBundle\Entity\ZiEn $ens
+     */
+    public function removeEn(\Recite\DataBundle\Entity\ZiEn $ens)
+    {
+        $this->ens->removeElement($ens);
+    }
+
+    /**
+     * Get ens
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getEns()
+    {
+        return $this->ens;
+    }
+
+    public static function pinyin($pinyin, $hasYindiao = true){
+        $yindiao = (int)substr($pinyin, -1);
+        $pinyin = substr($pinyin, 0, -1);
+
+        if($yindiao > 0 && $hasYindiao){
+            foreach(['a','e','i','o','u','v', false] as $yunmu){
+                if(strpos($pinyin, $yunmu)) break;
+            }
+
+            if($yunmu){
+                return str_replace($yunmu, 
+                        self::$pinyins[$yunmu.$yindiao], $pinyin);
+            }
+        }
+
+        return $pinyin;
     }
 }

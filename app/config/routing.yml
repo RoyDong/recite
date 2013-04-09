@@ -1,5 +1,5 @@
 recite_dict:
-    resource: "@ReciteDictBundle/Controller/"
+    resource: "@ReciteMainBundle/Controller/"
     type:     annotation
     prefix:   /
 

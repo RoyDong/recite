@@ -1,6 +1,6 @@
 <?php
 
-namespace Recite\DictBundle\Tests\Controller;
+namespace Recite\MainBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
