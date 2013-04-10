@@ -41,7 +41,6 @@ class User implements UserInterface
      */
     private $email;
 
-
     /**
      * @ORM\ManyToMany(targetEntity="Role", inversedBy="users")
      * @ORM\JoinTable(name="user_role")

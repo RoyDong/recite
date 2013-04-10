@@ -107,6 +107,24 @@ class Zi
      */
     private $books;
 
+    public static function pinyin($pinyin, $hasYindiao = true){
+        $yindiao = (int)substr($pinyin, -1); //音调
+        $pinyin = substr($pinyin, 0, -1);
+
+        if($yindiao > 0 && $hasYindiao){
+            foreach(['a','e','i','o','u','v', false] as $yunmu){ //韵母
+                if(strpos($pinyin, $yunmu)) break;
+            }
+
+            if($yunmu){
+                return str_replace($yunmu, 
+                        self::$yunmu[$yunmu.$yindiao], $pinyin);
+            }
+        }
+
+        return $pinyin;
+    }
+
     public function __construct() {
         $this->zhs = new ArrayCollection;
         $this->ens = new ArrayCollection;
@@ -280,24 +298,6 @@ class Zi
     public function getEns()
     {
         return $this->ens;
-    }
-
-    public static function pinyin($pinyin, $hasYindiao = true){
-        $yindiao = (int)substr($pinyin, -1);
-        $pinyin = substr($pinyin, 0, -1);
-
-        if($yindiao > 0 && $hasYindiao){
-            foreach(['a','e','i','o','u','v', false] as $yunmu){
-                if(strpos($pinyin, $yunmu)) break;
-            }
-
-            if($yunmu){
-                return str_replace($yunmu, 
-                        self::$yunmu[$yunmu.$yindiao], $pinyin);
-            }
-        }
-
-        return $pinyin;
     }
 
     /**
