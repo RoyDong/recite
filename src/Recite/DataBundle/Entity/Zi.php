@@ -101,10 +101,17 @@ class Zi
      */
     private $examples;
 
+    /**
+     *
+     * @ORM\ManyToMany(targetEntity="Book", mappedBy="zis")
+     */
+    private $books;
+
     public function __construct() {
         $this->zhs = new ArrayCollection;
         $this->ens = new ArrayCollection;
         $this->examples = new ArrayCollection;
+        $this->books = new ArrayCollection;
     }
 
     /**
@@ -324,5 +331,38 @@ class Zi
     public function getExamples()
     {
         return $this->examples;
+    }
+
+    /**
+     * Add books
+     *
+     * @param \Recite\DataBundle\Entity\Book $books
+     * @return Zi
+     */
+    public function addBook(\Recite\DataBundle\Entity\Book $books)
+    {
+        $this->books[] = $books;
+    
+        return $this;
+    }
+
+    /**
+     * Remove books
+     *
+     * @param \Recite\DataBundle\Entity\Book $books
+     */
+    public function removeBook(\Recite\DataBundle\Entity\Book $books)
+    {
+        $this->books->removeElement($books);
+    }
+
+    /**
+     * Get books
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getBooks()
+    {
+        return $this->books;
     }
 }
