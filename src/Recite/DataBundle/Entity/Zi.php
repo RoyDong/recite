@@ -95,9 +95,15 @@ class Zi
      */
     private $ens;
 
+    /**
+     * @ORM\OneToMany(targetEntity="ZiExample", mappedBy="zi")
+     */
+    private $examples;
+
     public function __construct() {
-        $this->zhs= new ArrayCollection;
-        $this->ens= new ArrayCollection;
+        $this->zhs = new ArrayCollection;
+        $this->ens = new ArrayCollection;
+        $this->examples = new ArrayCollection;
     }
 
     /**
@@ -284,5 +290,38 @@ class Zi
         }
 
         return $pinyin;
+    }
+
+    /**
+     * Add examples
+     *
+     * @param \Recite\DataBundle\Entity\ZiExample $examples
+     * @return Zi
+     */
+    public function addExample(\Recite\DataBundle\Entity\ZiExample $examples)
+    {
+        $this->examples[] = $examples;
+    
+        return $this;
+    }
+
+    /**
+     * Remove examples
+     *
+     * @param \Recite\DataBundle\Entity\ZiExample $examples
+     */
+    public function removeExample(\Recite\DataBundle\Entity\ZiExample $examples)
+    {
+        $this->examples->removeElement($examples);
+    }
+
+    /**
+     * Get examples
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getExamples()
+    {
+        return $this->examples;
     }
 }

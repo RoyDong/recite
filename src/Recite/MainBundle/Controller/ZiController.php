@@ -14,7 +14,7 @@ class ZiController extends BaseController
     /**
      * @Route("/{char}")
      */
-    public function indexAction($char)
+    public function basicAction($char)
     {
         $zi = $this->Zi->findOneByChar($char); 
 
@@ -22,10 +22,10 @@ class ZiController extends BaseController
             return $this->renderJson(['error' => 'not found :'.$char]);
         }
 
-        $records = [];
+        $zhs = [];
 
         foreach($zi->getZhs() as $zh){
-            $records[] = [
+            $zhs[] = [
                 'id' => $zh->getId(),
                 'pinyin' => $zh->getPinyin(),
                 'zhPinyin' => $zh->getZhPinyin(),
@@ -34,6 +34,6 @@ class ZiController extends BaseController
         }
 
         return $this->renderJson(['id' => $zi->getId(), 
-                'char' => $zi->getChar(), 'records' => $records]);
+                'char' => $zi->getChar(), 'zhs' => $zhs]);
     }
 }

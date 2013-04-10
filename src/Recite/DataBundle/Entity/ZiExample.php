@@ -5,12 +5,12 @@ namespace Recite\DataBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * ZiEn
+ * ZiExample
  *
- * @ORM\Table("zi_en")
- * @ORM\Entity(repositoryClass="Recite\DataBundle\Repository\ZiEnRepository")
+ * @ORM\Table("zi_example")
+ * @ORM\Entity(repositoryClass="Recite\DataBundle\Repository\ZiExampleRepository")
  */
-class ZiEn
+class ZiExample
 {
     /**
      * @var integer
@@ -23,15 +23,15 @@ class ZiEn
 
     /**
      *
-     * @ORM\Column(name="pinyin", type="string", length=10, nullable=true)
-     */
-    private $pinyin;
-
-    /**
-     *
      * @ORM\Column(name="content", type="string")
      */
     private $content;
+
+    /**
+     *
+     * @ORM\Column(name="en", type="string")
+     */
+    private $en;
 
     /**
      * @ORM\ManyToOne(targetEntity="Zi")
@@ -51,37 +51,10 @@ class ZiEn
     }
 
     /**
-     * Set pinyin
-     *
-     * @param string $pinyin
-     * @return ZiEn
-     */
-    public function setPinyin($pinyin)
-    {
-        $this->pinyin = $pinyin;
-    
-        return $this;
-    }
-
-    /**
-     * Get pinyin
-     *
-     * @return string 
-     */
-    public function getPinyin()
-    {
-        return $this->pinyin;
-    }
-
-    public function getZhPinyin(){
-        return Zi::pinyin($this->pinyin);
-    }
-
-    /**
      * Set content
      *
      * @param string $content
-     * @return ZiEn
+     * @return ZiExample
      */
     public function setContent($content)
     {
@@ -101,10 +74,33 @@ class ZiEn
     }
 
     /**
+     * Set en
+     *
+     * @param string $en
+     * @return ZiExample
+     */
+    public function setEn($en)
+    {
+        $this->en = $en;
+    
+        return $this;
+    }
+
+    /**
+     * Get en
+     *
+     * @return string 
+     */
+    public function getEn()
+    {
+        return $this->en;
+    }
+
+    /**
      * Set zi
      *
      * @param \Recite\DataBundle\Entity\Zi $zi
-     * @return ZiEn
+     * @return ZiExample
      */
     public function setZi(\Recite\DataBundle\Entity\Zi $zi = null)
     {
