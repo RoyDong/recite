@@ -17,10 +17,11 @@ class Zi
     /**
      * ā á ǎ à ē é ě è ī í ǐ ì ō ó ǒ ò ū ú ǔ ù ǖ ǘ ǚ ǜ ü ê ɑ  ń ń ň 
      * 
+     * 韵母和音调
      * 
      * @var array
      */
-    private static $pinyins = [
+    private static $yunmu = [
         'a1' => 'ā',
         'a2' => 'á',
         'a3' => 'ǎ',
@@ -285,7 +286,7 @@ class Zi
 
             if($yunmu){
                 return str_replace($yunmu, 
-                        self::$pinyins[$yunmu.$yindiao], $pinyin);
+                        self::$yunmu[$yunmu.$yindiao], $pinyin);
             }
         }
 

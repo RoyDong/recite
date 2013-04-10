@@ -23,7 +23,6 @@ class ZiController extends BaseController
         }
 
         $zhs = [];
-
         foreach($zi->getZhs() as $zh){
             $zhs[] = [
                 'id' => $zh->getId(),
@@ -33,7 +32,29 @@ class ZiController extends BaseController
             ];
         }
 
-        return $this->renderJson(['id' => $zi->getId(), 
-                'char' => $zi->getChar(), 'zhs' => $zhs]);
+        $ens = [];
+        foreach($zi->getEns() as $en){
+            $ens[] = [
+                'id' => $en->getId(),
+                'content' => $en->getContent()
+            ];
+        }
+
+        $examples = [];
+        foreach($zi->getExamples() as $example){
+            $examples[] = [
+                'id' => $example->getId(),
+                'content' => $example->getContent(),
+                'en' => $example->getEn()
+            ];
+        }
+
+        return $this->renderJson([
+            'id' => $zi->getId(), 
+            'char' => $zi->getChar(),
+            'zhs' => $zhs,
+            'ens' => $ens,
+            'examples' => $examples
+        ]);
     }
 }
