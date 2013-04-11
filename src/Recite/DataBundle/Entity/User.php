@@ -47,10 +47,16 @@ class User implements UserInterface
      */
     private $roles;
 
+    /**
+     * @ORM\OneToMany(targetEntity="UserLearnBook", mappedBy="user")
+     */
+    private $learningBooks;
+
     public function __construct()
     {
         $this->salt = md5(uniqid(null, true));
         $this->roles = new ArrayCollection();
+        $this->learningBooks = new ArrayCollection();
     }
 
     /**
@@ -220,5 +226,38 @@ class User implements UserInterface
     public function removeRole(\Recite\DataBundle\Entity\Role $roles)
     {
         $this->roles->removeElement($roles);
+    }
+
+    /**
+     * Add learningBooks
+     *
+     * @param \Recite\DataBundle\Entity\UserLearnBook $learningBooks
+     * @return User
+     */
+    public function addLearningBook(\Recite\DataBundle\Entity\UserLearnBook $learningBooks)
+    {
+        $this->learningBooks[] = $learningBooks;
+    
+        return $this;
+    }
+
+    /**
+     * Remove learningBooks
+     *
+     * @param \Recite\DataBundle\Entity\UserLearnBook $learningBooks
+     */
+    public function removeLearningBook(\Recite\DataBundle\Entity\UserLearnBook $learningBooks)
+    {
+        $this->learningBooks->removeElement($learningBooks);
+    }
+
+    /**
+     * Get learningBooks
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getLearningBooks()
+    {
+        return $this->learningBooks;
     }
 }

@@ -24,7 +24,7 @@ class Book
     private $id;
 
     /**
-     * @ORM\Column(name="title", type="string", length=60)
+     * @ORM\Column(name="title", type="string", length=60, unique=true)
      */
     private $title;
 
@@ -44,8 +44,14 @@ class Book
      */
     private $zis;
 
+    /**
+     * @ORM\OneToMany(targetEntity="UserLearnBook", mappedBy="book")
+     */
+    private $learningUsers;
+
     public function __construct() {
         $this->zis = new ArrayCollection;
+        $this->learningUsers = new ArrayCollection;
     }
 
     /**
@@ -158,5 +164,38 @@ class Book
     public function getZiCount()
     {
         return $this->ziCount;
+    }
+
+    /**
+     * Add learningUsers
+     *
+     * @param \Recite\DataBundle\Entity\UserLearnBook $learningUsers
+     * @return Book
+     */
+    public function addLearningUser(\Recite\DataBundle\Entity\UserLearnBook $learningUsers)
+    {
+        $this->learningUsers[] = $learningUsers;
+    
+        return $this;
+    }
+
+    /**
+     * Remove learningUsers
+     *
+     * @param \Recite\DataBundle\Entity\UserLearnBook $learningUsers
+     */
+    public function removeLearningUser(\Recite\DataBundle\Entity\UserLearnBook $learningUsers)
+    {
+        $this->learningUsers->removeElement($learningUsers);
+    }
+
+    /**
+     * Get learningUsers
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getLearningUsers()
+    {
+        return $this->learningUsers;
     }
 }
