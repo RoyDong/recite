@@ -29,7 +29,7 @@ class Book
     private $title;
 
     /**
-     * @ORM\Column(name="description", type="string")
+     * @ORM\Column(name="description", type="string", nullable=true)
      */
     private $description;
 
@@ -45,9 +45,15 @@ class Book
     private $zis;
 
     /**
+     * @ORM\Column(name="level", type="smallint")
+     */
+    private $level;
+
+    /**
      * @ORM\OneToMany(targetEntity="UserLearnBook", mappedBy="book")
      */
     private $learningUsers;
+
 
     public function __construct() {
         $this->zis = new ArrayCollection;
@@ -197,5 +203,28 @@ class Book
     public function getLearningUsers()
     {
         return $this->learningUsers;
+    }
+
+    /**
+     * Set level
+     *
+     * @param integer $level
+     * @return Book
+     */
+    public function setLevel($level)
+    {
+        $this->level = $level;
+    
+        return $this;
+    }
+
+    /**
+     * Get level
+     *
+     * @return integer 
+     */
+    public function getLevel()
+    {
+        return $this->level;
     }
 }
