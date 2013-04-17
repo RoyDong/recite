@@ -1,5 +1,5 @@
 services:
-    recite_authentication_listener:
+    recite.authentication_listener:
         class: Recite\UserBundle\Listener\AuthenticationListener
 
         

@@ -2,11 +2,8 @@
 
 namespace Recite\MainBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Recite\DataBundle\Controller\BaseController;
-use Recite\DataBundle\Entity\Book;
-use Recite\DataBundle\Entity\UserLearnBook;
 
 /**
  * @Route("/zi")

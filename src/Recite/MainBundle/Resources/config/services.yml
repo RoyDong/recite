@@ -1,2 +1,7 @@
 ## YAML Template.
 ---
+services:
+    recite.control_listener:
+        class: Recite\MainBundle\Listener\ControlListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }

@@ -15,20 +15,6 @@ use Recite\DataBundle\Entity\Book;
 
 class GenerateBookCommand extends ContainerAwareCommand
 {
-    private $output;
-
-    private $chars;
-
-    /**
-     *
-     * @var Book
-     */
-    private $book;
-
-    /**
-     * @var Doctrine\ORM\EntityManager
-     */
-    private $em;
 
     protected function configure()
     {

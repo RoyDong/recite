@@ -12,4 +12,11 @@ use Doctrine\ORM\EntityRepository;
  */
 class BookRepository extends EntityRepository
 {
+    public function findOne($idOrTitle){
+        if(is_numeric($idOrTitle)){
+            return $this->find((int)$idOrTitle);
+        }
+
+        return $this->findOneByTitle($idOrTitle);
+    }
 }
