@@ -35,9 +35,9 @@ class UserLearnBook
     private $book;
 
     /**
-     * @ORM\Column(name="detail", type="array")
+     * @ORM\Column(name="skill", type="array")
      */
-    private $detail;
+    private $skill;
 
     /**
      * Get id
@@ -81,7 +81,17 @@ class UserLearnBook
     public function setBook(\Recite\DataBundle\Entity\Book $book = null)
     {
         $this->book = $book;
-    
+        $this->skill = [];
+
+        foreach($book->getZis() as $zi){
+            /**
+             * v for value
+             * e for error
+             * r for repeat
+             */
+            $this->skill[$zi->getId()] = ['v' => 0, 'e' => 0, 'r' => 0];
+        }
+
         return $this;
     }
 
@@ -93,28 +103,5 @@ class UserLearnBook
     public function getBook()
     {
         return $this->book;
-    }
-
-    /**
-     * Set detail
-     *
-     * @param array $detail
-     * @return UserLearnBook
-     */
-    public function setDetail($detail)
-    {
-        $this->detail = $detail;
-    
-        return $this;
-    }
-
-    /**
-     * Get detail
-     *
-     * @return array 
-     */
-    public function getDetail()
-    {
-        return $this->detail;
     }
 }

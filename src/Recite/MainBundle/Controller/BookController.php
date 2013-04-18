@@ -7,6 +7,7 @@ use JMS\SecurityExtraBundle\Annotation\Secure;
 use Recite\DataBundle\Controller\BaseController;
 use Recite\DataBundle\Entity\Book;
 use Recite\DataBundle\Entity\UserLearnBook;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * @Route("/book")
@@ -28,9 +29,7 @@ class BookController extends BaseController
             ]);
         }
 
-        return $this->renderJson([
-            'error' => 'book not found'
-        ]);
+        throw new HttpException(404, 'book not found');
     }
 
     /**
@@ -38,12 +37,18 @@ class BookController extends BaseController
      */
     public function addAction($id)
     {
-        $book = $this->Book->findOne($id);
-        
+        $this->accessFilter(['ROLE_USER'], 'post');
         $user = $this->getUser();
+        $book = $this->Book->findOne($id);
 
-        return $this->renderJson([
-            'error' => 'book not found'
-        ]);
+        if(!$book){
+            throw new HttpException(404, 'book not found');
+        }
+
+        $learnBook = (new UserLearnBook)->setUser($user)->setBook($book);
+        $this->em()->persist($learnBook);
+        $this->em()->flush();
+
+        return $this->renderJson(['id' => $learnBook->getId()]);
     }
 }

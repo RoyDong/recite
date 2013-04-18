@@ -3,6 +3,7 @@
 namespace Recite\DataBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpFoundation\Response;
 
 class BaseController extends Controller
@@ -40,5 +41,28 @@ class BaseController extends Controller
         $response->headers->set('Content-Type', 'application/json');
 
         return $response;
+    }
+
+    /**
+     * 
+     * @param array $roles
+     * @param string $method
+     * @return null
+     * @throws AccessDeniedHttpException
+     */
+    protected function accessFilter($roles = null, $method = null){
+        if($method && $this->getRequest()->getMethod() !== strtoupper($method)){
+            throw new HttpException(403, 'method is not allowed');
+        }
+
+        if($roles){
+            $security = $this->get('security.context');
+
+            foreach($roles as $role){
+                if($security->isGranted($role)) return;
+            }
+
+            throw new HttpException(403, 'no permissions');
+        }
     }
 }
