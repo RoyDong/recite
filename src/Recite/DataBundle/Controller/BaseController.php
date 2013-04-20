@@ -51,7 +51,9 @@ class BaseController extends Controller
      * @throws AccessDeniedHttpException
      */
     protected function accessFilter($roles = null, $method = null){
-        if($method && $this->getRequest()->getMethod() !== strtoupper($method)){
+        if($method && $this->get('kernel')->getEnvironment() !== 'dev' && 
+                $this->getRequest()->getMethod() !== strtoupper($method)){
+
             throw new HttpException(403, 'method is not allowed');
         }
 
