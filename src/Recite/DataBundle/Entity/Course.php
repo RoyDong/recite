@@ -161,11 +161,11 @@ class Course
     private $status = 0;
 
     /**
-     * 3:00 as the day day division line
+     * 3:00 as the day day division timeline
      * 
      * @return int
      */
-    public static function dayDivisionLine($time = 'time()'){
+    public static function dayDivisionTime($time = 'time()'){
         return strtotime(date('Y-m-d', $time)) + 10800;
     }
 
@@ -500,6 +500,11 @@ class Course
         return $this;
     }
 
+    /**
+     * whether the class is paused
+     * 
+     * @return boolean
+     */
     public function isPaused(){
         return $this->pausedAt > 0;
     }
@@ -510,17 +515,17 @@ class Course
      * @return type
      */
     public function getClassStatus(){
-        $timeline = Course::dayDivisionLine();
+        $time = Course::dayDivisionTime();
 
-        if($this->reviewEndAt > $timeline){
+        if($this->reviewEndAt > $time){
             return Course::CLASS_STATUS_CLOSE;
         }
 
-        if($this->reviewBeginAt > $timeline){
+        if($this->reviewBeginAt > $time){
             return Course::CLASS_STATUS_REVIEW;
         }
         
-        if($this->endAt > $timeline){
+        if($this->endAt > $time){
             return Course::CLASS_STATUS_MAIN;
         }
 
