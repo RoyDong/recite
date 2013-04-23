@@ -488,6 +488,18 @@ class Course
         return $this;
     }
 
+    public function pause(){
+        $this->pausedAt = time();
+
+        return $this;
+    }
+
+    public function start(){
+        $this->pausedAt = 0;
+
+        return $this;
+    }
+
     public function isPaused(){
         return $this->pausedAt > 0;
     }
