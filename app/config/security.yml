@@ -39,7 +39,7 @@ security:
                 username_parameter: email
                 password_parameter: password
 
-            provider: all
+            provider: db
 
             remember_me:
                 key: "%secret%"

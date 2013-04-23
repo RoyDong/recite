@@ -5,16 +5,21 @@ namespace Recite\DataBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * UserLearnBook
+ * Lesson
  *
- * @ORM\Table("user_learn_book")
- * @ORM\Entity(repositoryClass="Recite\DataBundle\Repository\UserLearnBookRepository")
+ * @ORM\Table("course")
+ * @ORM\Entity(repositoryClass="Recite\DataBundle\Repository\CourseRepository")
  * 
  */
-class UserLearnBook
+class Course
 {
-    const STATUS_CLOSED = 0;
-    const STATUS_OPENED = 1;
+    const STATUS_CLOSE = 0;
+    const STATUS_OPEN = 1;
+
+    const CLASS_STATUS_OPEN = 0;
+    const CLASS_STATUS_MAIN = 1;   //main lesson
+    const CLASS_STATUS_REVIEW = 2;
+    const CLASS_STATUS_CLOSE = 3;
 
     /**
      * @var integer
@@ -26,13 +31,13 @@ class UserLearnBook
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="learningBooks")
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="courses")
      * @ORM\JoinColumn(name="uid", referencedColumnName="id")
      */
     private $user;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Book", inversedBy="learningUsers")
+     * @ORM\ManyToOne(targetEntity="Book", inversedBy="courses")
      * @ORM\JoinColumn(name="bid", referencedColumnName="id")
      */
     private $book;
@@ -108,14 +113,14 @@ class UserLearnBook
      *
      * @ORM\Column(name="lesson_begin_at",type="integer")
      */
-    private $lessonBeginAt = 0;
+    private $beginAt = 0;
 
     /**
      * 上一节课开始的时间
      *
      * @ORM\Column(name="lesson_end_time",type="integer")
      */
-    private $lessonEndAt = 0;
+    private $endAt = 0;
 
     /**
      *
@@ -156,12 +161,12 @@ class UserLearnBook
     private $status = 0;
 
     /**
-     * 3:00 as the day divid timeline
+     * 3:00 as the day day division line
      * 
      * @return int
      */
-    public static function dayDividTimeline(){
-        return strtotime(date('Y-m-d')) + 10800;
+    public static function dayDivisionLine($time = 'time()'){
+        return strtotime(date('Y-m-d', $time)) + 10800;
     }
 
     /**
@@ -178,7 +183,7 @@ class UserLearnBook
      * Set user
      *
      * @param \Recite\DataBundle\Entity\User $user
-     * @return UserLearnBook
+     * @return Course
      */
     public function setUser(\Recite\DataBundle\Entity\User $user = null)
     {
@@ -201,7 +206,7 @@ class UserLearnBook
      * Set book
      *
      * @param \Recite\DataBundle\Entity\Book $book
-     * @return UserLearnBook
+     * @return Course
      */
     public function setBook(\Recite\DataBundle\Entity\Book $book = null)
     {
@@ -246,7 +251,7 @@ class UserLearnBook
      * Set lessonNo
      *
      * @param integer $lessonNo
-     * @return UserLearnBook
+     * @return Course
      */
     public function setLessonNo($lessonNo)
     {
@@ -269,11 +274,11 @@ class UserLearnBook
      * Set lessonBeginAt
      *
      * @param integer $lessonBeginAt
-     * @return UserLearnBook
+     * @return Course
      */
-    public function setLessonBeginAt($lessonBeginAt)
+    public function setBeginAt($beginAt)
     {
-        $this->lessonBeginAt = $lessonBeginAt;
+        $this->beginAt = $beginAt;
     
         return $this;
     }
@@ -283,20 +288,20 @@ class UserLearnBook
      *
      * @return integer 
      */
-    public function getLessonBeginAt()
+    public function getBeginAt()
     {
-        return $this->lessonBeginAt;
+        return $this->beginAt;
     }
 
     /**
-     * Set lessonEndAt
+     * Set endAt
      *
-     * @param integer $lessonEndAt
-     * @return UserLearnBook
+     * @param integer $endAt
+     * @return Course
      */
-    public function setLessonEndAt($lessonEndAt)
+    public function setEndAt($endAt)
     {
-        $this->lessonEndAt = $lessonEndAt;
+        $this->endAt = $endAt;
     
         return $this;
     }
@@ -315,7 +320,7 @@ class UserLearnBook
      * Set reviewBeginAt
      *
      * @param integer $reviewBeginAt
-     * @return UserLearnBook
+     * @return Course
      */
     public function setReviewBeginAt($reviewBeginAt)
     {
@@ -338,7 +343,7 @@ class UserLearnBook
      * Set reviewEndAt
      *
      * @param integer $reviewEndAt
-     * @return UserLearnBook
+     * @return Course
      */
     public function setReviewEndAt($reviewEndAt)
     {
@@ -361,7 +366,7 @@ class UserLearnBook
      * Set pausedAt
      *
      * @param integer $pausedAt
-     * @return UserLearnBook
+     * @return Course
      */
     public function setPausedAt($pausedAt)
     {
@@ -384,7 +389,7 @@ class UserLearnBook
      * Set classTime
      *
      * @param integer $classTime
-     * @return UserLearnBook
+     * @return Course
      */
     public function setClassTime($classTime)
     {
@@ -407,7 +412,7 @@ class UserLearnBook
      * Set purchaseAt
      *
      * @param integer $purchaseAt
-     * @return UserLearnBook
+     * @return Course
      */
     public function setPurchaseAt($purchaseAt)
     {
@@ -430,7 +435,7 @@ class UserLearnBook
      * Set status
      *
      * @param integer $status
-     * @return UserLearnBook
+     * @return Course
      */
     public function setStatus($status)
     {
@@ -457,42 +462,56 @@ class UserLearnBook
         return $this->content;
     }
 
-    public function getLessonContent(){
-        $content = [];
-
-        foreach($this->results as $zid => $result){
-            if($result['time']){
-
-            }
-            $content[$zid] = $result;
-        }
-    }
-
-    public function getReviewContent(){
-        foreach($this->results as $zid => $result){
-            
-        }
+    /**
+     * Set results
+     *
+     * @param array $results
+     * @return Course
+     */
+    public function setResults($results)
+    {
+        $this->results = $results;
+    
+        return $this;
     }
 
     /**
-     * 
-     * @return string main|review or null
+     * Set content
+     *
+     * @param array $content
+     * @return Course
      */
-    public function getClassType(){
-        $timeline = self::dayDividTimeline();
-
-        if($this->reviewEndAt >= $timeline){
-            return null;
-        }
-
-        if($this->reviewBeginAt >= $timeline){
-            return 'review';
-        }
-
-        return 'main';
+    public function setContent($content)
+    {
+        $this->content = $content;
+    
+        return $this;
     }
 
-    public function getClassStatus(){
+    public function isPaused(){
+        return $this->pausedAt > 0;
+    }
 
+    /**
+     * the status here do not contains the pausing info, see Course::isPaused()
+     * 
+     * @return type
+     */
+    public function getClassStatus(){
+        $timeline = Course::dayDivisionLine();
+
+        if($this->reviewEndAt > $timeline){
+            return Course::CLASS_STATUS_CLOSE;
+        }
+
+        if($this->reviewBeginAt > $timeline){
+            return Course::CLASS_STATUS_REVIEW;
+        }
+        
+        if($this->endAt > $timeline){
+            return Course::CLASS_STATUS_MAIN;
+        }
+
+        return Course::CLASS_STATUS_OPEN;
     }
 }

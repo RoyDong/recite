@@ -5,26 +5,26 @@ namespace Recite\MainBundle\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Recite\DataBundle\Controller\BaseController;
 use Recite\DataBundle\Entity\Book;
-use Recite\DataBundle\Entity\UserLearnBook;
+use Recite\DataBundle\Entity\Course;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
- * @Route("/lesson")
+ * @Route("/course")
  */
-class LessonController extends BaseController {
+class CourseController extends BaseController {
 
     /**
-     * @Route("/list")
+     * @Route("/lessons")
      */
-    public function listAction(){
+    public function lessonsAction(){
         $this->accessFilter(['ROLE_USER']);
         $user = $this->getUser();
-        $learns = $user->getOpenedBooks();
+        $course = $user->getOpenedCourses();
 
-        if($learns){
-            foreach($learns as $learn){
-
-            }
+        foreach($course as $course){
+            ld($course);
         }
+
+        return $this->renderJson();
     }
 }

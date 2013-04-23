@@ -4,7 +4,7 @@ namespace Recite\MainBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Recite\DataBundle\Controller\BaseController;
-use Recite\DataBundle\Entity\UserLearnBook;
+use Recite\DataBundle\Entity\Course;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
@@ -13,21 +13,14 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class BookController extends BaseController
 {
     /**
-     * @Route("/{id}")
+     * @Route("/{id}",requirements={"id" = "\d+"})
      */
     public function showAction($id){
         $this->accessFilter(['ROLE_USER']);
         $book = $this->Book->findOne($id);
-        $user = $this->getUser();
 
         if(!$book){
             throw new HttpException(404, 'book not found');
-        }
-
-        $learn = $user->getLearningByBook($book);
-
-        if($learn){
-            ldd($learn);
         }
 
         if($book){
@@ -41,7 +34,7 @@ class BookController extends BaseController
     }
 
     /**
-     * @Route("/{id}/purchase")
+     * @Route("/{id}/purchase",requirements={"id" = "\d+"})
      */
     public function purchaseAction($id) {
         $this->accessFilter(['ROLE_USER'], 'post');
@@ -52,25 +45,25 @@ class BookController extends BaseController
             throw new HttpException(404, 'book not found');
         }
 
-        if($user->getLearningByBook($book)){
+        if($user->getCourseByBook($book)){
             throw new HttpException(403, 'you have already purchased this book');
         }
 
-        $learn = (new UserLearnBook)->setUser($user)
+        $course = (new Course)->setUser($user)
                 ->setBook($book)
                 ->setPurchaseAt(time());
 
-        if($user->getLearningBooks()->count() < 1){
-            $learn->setStatus(UserLearnBook::STATUS_OPENED);
+        if($user->getCourses()->count() < 1){
+            $course->setStatus(Course::STATUS_OPEN);
         }
 
-        $this->em()->persist($learn);
+        $this->em()->persist($course);
 
         return $this->renderJson([]);
     }
 
     /**
-     * @Route("/{id}/open")
+     * @Route("/{id}/open",requirements={"id" = "\d+"})
      */
     public function openAction($id){
         $this->accessFilter(['ROLE_USER'], 'post');
@@ -81,10 +74,10 @@ class BookController extends BaseController
             throw new HttpException(404, 'book not found');
         }
 
-        $learn = $user->getLearningByBook($book);
+        $course = $user->getCourseByBook($book);
 
-        if($learn){
-            $learn->setStatus(UserLearnBook::STATUS_OPENED);
+        if($course){
+            $course->setStatus(Course::STATUS_OPEN);
             return $this->renderJson([]);
         }
 
@@ -92,7 +85,7 @@ class BookController extends BaseController
     }
 
     /**
-     * @Route("/{id}/close")
+     * @Route("/{id}/close",requirements={"id" = "\d+"})
      */
     public function closeAction($id){
         $this->accessFilter(['ROLE_USER'], 'post');
@@ -103,10 +96,10 @@ class BookController extends BaseController
             throw new HttpException(404, 'book not found');
         }
 
-        $learn = $user->getLearningByBook($book);
+        $course = $user->getCourseByBook($book);
 
-        if($learn){
-            $learn->setStatus(UserLearnBook::STATUS_CLOSED);
+        if($course){
+            $course->setStatus(Course::STATUS_CLOSE);
             return $this->renderJson([]);
         }
 

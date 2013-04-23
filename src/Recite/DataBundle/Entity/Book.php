@@ -50,14 +50,14 @@ class Book
     private $level;
 
     /**
-     * @ORM\OneToMany(targetEntity="UserLearnBook", mappedBy="book")
+     * @ORM\OneToMany(targetEntity="Course", mappedBy="book")
      */
-    private $learningUsers;
+    private $courses;
 
 
     public function __construct() {
         $this->zis = new ArrayCollection;
-        $this->learningUsers = new ArrayCollection;
+        $this->courses = new ArrayCollection;
     }
 
     /**
@@ -173,39 +173,6 @@ class Book
     }
 
     /**
-     * Add learningUsers
-     *
-     * @param \Recite\DataBundle\Entity\UserLearnBook $learningUsers
-     * @return Book
-     */
-    public function addLearningUser(\Recite\DataBundle\Entity\UserLearnBook $learningUsers)
-    {
-        $this->learningUsers[] = $learningUsers;
-    
-        return $this;
-    }
-
-    /**
-     * Remove learningUsers
-     *
-     * @param \Recite\DataBundle\Entity\UserLearnBook $learningUsers
-     */
-    public function removeLearningUser(\Recite\DataBundle\Entity\UserLearnBook $learningUsers)
-    {
-        $this->learningUsers->removeElement($learningUsers);
-    }
-
-    /**
-     * Get learningUsers
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getLearningUsers()
-    {
-        return $this->learningUsers;
-    }
-
-    /**
      * Set level
      *
      * @param integer $level
@@ -226,5 +193,38 @@ class Book
     public function getLevel()
     {
         return $this->level;
+    }
+
+    /**
+     * Add courses
+     *
+     * @param \Recite\DataBundle\Entity\Course $courses
+     * @return Book
+     */
+    public function addCourse(\Recite\DataBundle\Entity\Course $courses)
+    {
+        $this->courses[] = $courses;
+    
+        return $this;
+    }
+
+    /**
+     * Remove courses
+     *
+     * @param \Recite\DataBundle\Entity\Course $courses
+     */
+    public function removeCourse(\Recite\DataBundle\Entity\Course $courses)
+    {
+        $this->courses->removeElement($courses);
+    }
+
+    /**
+     * Get courses
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getCourses()
+    {
+        return $this->courses;
     }
 }

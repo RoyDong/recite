@@ -13,8 +13,7 @@ use Doctrine\Common\Collections\Criteria;
  * @ORM\Table(name="user")
  * @ORM\Entity(repositoryClass="Recite\DataBundle\Repository\UserRepository")
  */
-class User implements UserInterface
-{
+class User implements UserInterface, \Serializable {
     /**
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -49,15 +48,15 @@ class User implements UserInterface
     private $roles;
 
     /**
-     * @ORM\OneToMany(targetEntity="UserLearnBook", mappedBy="user")
+     * @ORM\OneToMany(targetEntity="Course", mappedBy="user")
      */
-    private $learningBooks;
+    private $courses;
 
     public function __construct()
     {
         $this->salt = md5(uniqid(null, true));
         $this->roles = new ArrayCollection();
-        $this->learningBooks = new ArrayCollection();
+        $this->courses = new ArrayCollection();
     }
 
     /**
@@ -229,58 +228,58 @@ class User implements UserInterface
         $this->roles->removeElement($roles);
     }
 
+    public function getCourseByBook($book){
+        $criteria = Criteria::create()
+                ->where(Criteria::expr()->eq('book', $book))
+                ->setMaxResults(1);
+
+        return $this->courses->matching($criteria)->first();
+    }
+
+    public function getOpenedCourses(){
+        $criteria = Criteria::create()
+                ->where(Criteria::expr()->eq('status', Course::STATUS_OPEN));
+
+        return $this->courses->matching($criteria);
+    }
+
+    public function getClosedCourses(){
+        $criteria = Criteria::create()
+                ->where(Criteria::expr()->eq('status', Course::STATUS_CLOSE));
+
+        return $this->courses->matching($criteria);
+    }
+
     /**
-     * Add learningBooks
+     * Add courses
      *
-     * @param \Recite\DataBundle\Entity\UserLearnBook $learningBooks
+     * @param \Recite\DataBundle\Entity\Course $courses
      * @return User
      */
-    public function addLearningBook(\Recite\DataBundle\Entity\UserLearnBook $learningBooks)
+    public function addCourse(\Recite\DataBundle\Entity\Course $courses)
     {
-        $this->learningBooks[] = $learningBooks;
+        $this->courses[] = $courses;
     
         return $this;
     }
 
     /**
-     * Remove learningBooks
+     * Remove courses
      *
-     * @param \Recite\DataBundle\Entity\UserLearnBook $learningBooks
+     * @param \Recite\DataBundle\Entity\Course $courses
      */
-    public function removeLearningBook(\Recite\DataBundle\Entity\UserLearnBook $learningBooks)
+    public function removeCourse(\Recite\DataBundle\Entity\Course $courses)
     {
-        $this->learningBooks->removeElement($learningBooks);
+        $this->courses->removeElement($courses);
     }
 
     /**
-     * Get learningBooks
+     * Get courses
      *
      * @return \Doctrine\Common\Collections\Collection 
      */
-    public function getLearningBooks()
+    public function getCourses()
     {
-        return $this->learningBooks;
-    }
-
-    public function getLearningByBook($book){
-        $criteria = Criteria::create()
-                ->where(Criteria::expr()->eq('book', $book))
-                ->setMaxResults(1);
-
-        return $this->learningBooks->matching($criteria)->first();
-    }
-
-    public function getOpenedBooks(){
-        $criteria = Criteria::create()
-                ->where(Criteria::expr()->eq('status', UserLearnBook::STATUS_OPENED));
-
-        return $this->learningBooks->matching($criteria);
-    }
-
-    public function getClosedBooks(){
-        $criteria = Criteria::create()
-                ->where(Criteria::expr()->eq('status', UserLearnBook::STATUS_CLOSED));
-
-        return $this->learningBooks->matching($criteria);
+        return $this->courses;
     }
 }

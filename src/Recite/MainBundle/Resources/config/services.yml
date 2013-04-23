@@ -1,9 +1,9 @@
 ## YAML Template.
 ---
 services:
-    recite.control_listener:
+    recite.action_listener:
         class: Recite\MainBundle\Listener\ActionListener
-        arguments: [@security.context, @doctrine.orm.default_entity_manager]
+        arguments: ['@security.context', '@doctrine.orm.default_entity_manager']
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
             - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
