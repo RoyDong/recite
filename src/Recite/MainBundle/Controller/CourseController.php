@@ -19,12 +19,17 @@ class CourseController extends BaseController {
     public function lessonsAction(){
         $this->accessFilter(['ROLE_USER']);
         $user = $this->getUser();
-        $course = $user->getOpenedCourses();
+        $courses = $user->getOpenedCourses();
+        $json = [];
 
-        foreach($course as $course){
-            ld($course);
+        foreach($courses as $course){
+            $json[] = [
+                'classStatus' => $course->getClassStatus(),
+                'content' => $course->getContent(),
+                'pausedAt' => $course->getPausedAt()
+            ];
         }
 
-        return $this->renderJson();
+        return $this->renderJson($json);
     }
 }

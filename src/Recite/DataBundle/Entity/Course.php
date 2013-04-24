@@ -18,8 +18,9 @@ class Course
 
     const CLASS_STATUS_OPEN = 0;
     const CLASS_STATUS_MAIN = 1;   //main lesson
-    const CLASS_STATUS_REVIEW = 2;
-    const CLASS_STATUS_CLOSE = 3;
+    const CLASS_STATUS_MAIN_END = 2;   //main lesson
+    const CLASS_STATUS_REVIEW = 3;
+    const CLASS_STATUS_CLOSE = 4;
 
     /**
      * @var integer
@@ -43,52 +44,6 @@ class Course
     private $book;
 
     /**
-     * results 字段保存了用户学习这本书的详细进度，记录了他当前对于每一个字的熟练程度(level)，
-     * 学习了几轮，以及出错了几次等等信息
-     * 
-     * 字的初始level为0，当字的level到了6级或这以上则表示这个字已经被用户掌握，学习完成
-     * 
-     * 学习按照课时（lesson）进行，每天最多有两个课时（可能没有），每节课不应该超过半个小时
-     * 每节课不能暂停超过20分钟，否则这节课的学习结果将作废，需要重新开始
-     * 
-     * 
-     * 根据begin end时间判断当前的学习状态（lesson或review或都没开始或都已结束，
-     *       lesson没开始，review一定没开始，review结束了lesson一定结束）
-     * 
-     * 
-     * lesson选择每次要学习的字和分组：根据lesson和字level来选取这节课需要学习的字：
-     *     1.第一次学习这本书（last_lesson_no为0）依次取出20字
-     *     2.取出40个level大于0并且学习时间（time）已到的字，如果不足40个则取出20个level为
-     *       0的字,取完为止
-     * 
-     * review选择level为1的单词进行学习，最多20个
-     * 
-     * 把字按五个一组划分，最后一组允许不足五个，学习过程如下： 
-     *     1.依次显示第n组每个字的解释，让用户浏览（view）。如果n组不存在则进入5步
-     *     2.然后开始测试（test）第n-1组（上一组）的五个字，按浏览次序依次测试，如果上一组不存在则略过2，3步
-     *     3.测试结果（result）列出这次test的字，标记出哪些字在本次test中通过，哪些没有还需要继续学习
-     *     4.n=n+1 循环进入第1步
-     *     5.一轮（round）完成 
-     * 
-     * view每个字时用户有两个选择:
-     *     1.不明白。选择此项表明用户不认识或者不熟悉这个字，该字的score=0
-     *     2.我会了。选择此项表明用户熟知这个字，该字的score=1
-     * 
-     * test每个字时用户从一些（4个左右）选项中选择出唯一一个正确的解释：
-     *     选择正确：该字的score+1
-     *     选择错误：该字的score=0
-     * 计算出得分后：
-     *     1.字的level=0,score=2表明用户（极有可能）第一次学习该字之前就已经熟知该字，
-     *       字的level直接变为6
-     *     2.score > 0，通过测试，level = level + score
-     *     3.score = 0，没有通过测试，level不变, error + 1
-     *     
-     * result:得分大于0的字为学习通过，否则需要继续学习。学习通过的字根据level计算出下次学习
-     * 的时间（time）。level所对应的间隔时间：
-     *     1 => 3h, 2 => 1d, 3 => 2d, 4 => 7d, 5 => 30d
-     * 
-     * 每节课取出的所有字都通过则该课时完成，如果学习时间（class_time）超过40分钟则强制结束，
-     * 并保存学习结果，没有通过的单词下节课学习
      * 
      * 
      * @ORM\Column(name="results", type="array")
@@ -160,13 +115,20 @@ class Course
      */
     private $status = 0;
 
+
+    private $newZiLimit = 20;
+
+    private $ziLimit = 40;
+
+    private $maxLevel = 6;
+
     /**
      * 3:00 as the day day division timeline
      * 
      * @return int
      */
-    public static function dayDivisionTime($time = 'time()'){
-        return strtotime(date('Y-m-d', $time)) + 10800;
+    public static function dayDivisionTime($time = null){
+        return strtotime(date('Y-m-d', $time ?: time())) + 10800;
     }
 
     /**
@@ -386,19 +348,6 @@ class Course
     }
 
     /**
-     * Set classTime
-     *
-     * @param integer $classTime
-     * @return Course
-     */
-    public function setClassTime($classTime)
-    {
-        $this->classTime = $classTime;
-    
-        return $this;
-    }
-
-    /**
      * Get classTime
      *
      * @return integer 
@@ -455,14 +404,6 @@ class Course
     }
 
     /**
-     *
-     * @return array
-     */
-    public function getContent(){
-        return $this->content;
-    }
-
-    /**
      * Set results
      *
      * @param array $results
@@ -473,40 +414,6 @@ class Course
         $this->results = $results;
     
         return $this;
-    }
-
-    /**
-     * Set content
-     *
-     * @param array $content
-     * @return Course
-     */
-    public function setContent($content)
-    {
-        $this->content = $content;
-    
-        return $this;
-    }
-
-    public function pause(){
-        $this->pausedAt = time();
-
-        return $this;
-    }
-
-    public function start(){
-        $this->pausedAt = 0;
-
-        return $this;
-    }
-
-    /**
-     * whether the class is paused
-     * 
-     * @return boolean
-     */
-    public function isPaused(){
-        return $this->pausedAt > 0;
     }
 
     /**
@@ -526,9 +433,82 @@ class Course
         }
         
         if($this->endAt > $time){
+            return Course::CLASS_STATUS_MAIN_END;
+        }
+
+        if($this->beginAt > $time){
             return Course::CLASS_STATUS_MAIN;
         }
 
         return Course::CLASS_STATUS_OPEN;
+    }
+
+    public function getContent(){
+        $classStatus = $this->getClassStatus();        
+
+        if($classStatus === Course::CLASS_STATUS_OPEN){
+            $this->initContent();
+        }
+
+        if($classStatus === Course::CLASS_STATUS_MAIN_END){
+            $this->initReviewContent();
+        }
+
+        if($classStatus === Course::CLASS_STATUS_CLOSE){
+            return null;
+        }
+
+        return $this->content;
+    }
+
+    private function initContent(){
+        $divisionTime = Course::dayDivisionTime();
+        $reviewList = [];
+        $ziCount = 0;
+
+        foreach($this->results as $id => $result){
+            if($result['l'] > 0 && $result['l'] < $this->maxLevel && 
+                    $ziCount < 40 && $result['t'] < $divisionTime){
+
+                $reviewList[$id] = $result;
+                $ziCount++;
+            }
+        }
+
+        $newList = [];
+        $newZiCount = 0;
+
+        if($ziCount < 40){
+            foreach($this->results as $id => $result){
+                if($result['l'] === 0 && $newZiCount < 20 && $ziCount < 40){
+                    $newList[$id] = $result;
+                    $newZiCount++;
+                    $ziCount++;
+                }
+            }
+        }
+
+        $this->content = [
+            'type' => Course::CLASS_STATUS_MAIN,
+            'review' => $reviewList,
+            'new' => $newList,
+        ];
+    }
+
+    private function initReviewContent(){
+        $newList = [];
+        $newZiCount = 0;
+
+        foreach($this->results as $id => $result){
+            if($result['l'] === 0 && $newZiCount < 20){
+                $newList[$id] = $result;
+                $newZiCount++;
+            }
+        }
+
+        $this->content = [
+            'type' => Course::CLASS_STATUS_REVIEW,
+            'new' => $newList,
+        ];
     }
 }
