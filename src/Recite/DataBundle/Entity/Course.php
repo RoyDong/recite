@@ -22,6 +22,10 @@ class Course
     const CLASS_STATUS_REVIEW = 3;
     const CLASS_STATUS_CLOSE = 4;
 
+    const ACTION_VIEW = 0;
+    const ACTION_TEST = 1;
+    const ACTION_REVIEW = 2;
+
     /**
      * @var integer
      *
@@ -52,9 +56,9 @@ class Course
 
     /**
      * 
-     * @ORM\Column(name="content", type="array")
+     * @ORM\Column(name="context", type="array")
      */
-    private $content;
+    private $context;
 
     /**
      * lesson number
@@ -115,12 +119,11 @@ class Course
      */
     private $status = 0;
 
-
-    private $newZiLimit = 20;
+    private $maxLevel = 6;
 
     private $ziLimit = 40;
 
-    private $maxLevel = 6;
+    private $newZiLimit = 20;
 
     /**
      * 3:00 as the day day division timeline
@@ -176,14 +179,8 @@ class Course
         $this->results = [];
 
         foreach($book->getZis() as $zi){
-            /**
-             * l for level
-             * s for score
-             * e for error 学习时出现错误的次数
-             * t for time  下次出现时间点
-             */
             $this->results[$zi->getId()] = [
-                'l' => 0, 's' => 0, 'e' => 0, 't' => 0, ];
+                'level' => 0, 'error' => 0, 'time' => 0];
         }
 
         return $this;
@@ -393,6 +390,11 @@ class Course
         return $this;
     }
 
+    public function close(){
+        $this->status = Course::STATUS_CLOSE;
+        $this->context = null;
+    }
+
     /**
      * Get status
      *
@@ -401,6 +403,10 @@ class Course
     public function getStatus()
     {
         return $this->status;
+    }
+
+    public function isOpen(){
+        return $this->status === Course::STATUS_OPEN;
     }
 
     /**
@@ -443,22 +449,35 @@ class Course
         return Course::CLASS_STATUS_OPEN;
     }
 
-    public function getContent(){
-        $classStatus = $this->getClassStatus();        
-
-        if($classStatus === Course::CLASS_STATUS_OPEN){
-            $this->initContent();
-        }
-
-        if($classStatus === Course::CLASS_STATUS_MAIN_END){
-            $this->initReviewContent();
-        }
+    public function getContext(){
+        $classStatus = $this->getClassStatus();
 
         if($classStatus === Course::CLASS_STATUS_CLOSE){
             return null;
         }
 
-        return $this->content;
+        if($classStatus === Course::CLASS_STATUS_OPEN &&
+                !$this->isContentInitialized(Course::CLASS_STATUS_MAIN)){
+
+            $this->initContent();
+        }else if($classStatus === Course::CLASS_STATUS_MAIN_END &&
+                !$this->isContentInitialized(Course::CLASS_STATUS_REVIEW)){
+
+            $this->initReviewContent();
+        }
+
+        return $this->context;
+    }
+
+    private function isContentInitialized($type = Course::CLASS_STATUS_MAIN){
+        $divisionTime = Course::dayDivisionTime();
+        if(is_array($this->context) && $this->context['type'] === $type &&
+                $this->context['time'] > $divisionTime){
+
+            return true;
+        }
+
+        return false;
     }
 
     private function initContent(){
@@ -467,10 +486,12 @@ class Course
         $ziCount = 0;
 
         foreach($this->results as $id => $result){
-            if($result['l'] > 0 && $result['l'] < $this->maxLevel && 
-                    $ziCount < 40 && $result['t'] < $divisionTime){
+            if($result['level'] > 0 && $result['level'] < $this->maxLevel && 
+                    $ziCount < $this->ziLimit && $result['time'] < $divisionTime){
 
-                $reviewList[$id] = $result;
+                $result['score'] = 0;
+                $result['id'] = $id;
+                $reviewList[] = $result;
                 $ziCount++;
             }
         }
@@ -478,20 +499,27 @@ class Course
         $newList = [];
         $newZiCount = 0;
 
-        if($ziCount < 40){
+        if($ziCount < $this->ziLimit){
             foreach($this->results as $id => $result){
-                if($result['l'] === 0 && $newZiCount < 20 && $ziCount < 40){
-                    $newList[$id] = $result;
+                if($result['level'] === 0 && $newZiCount < $this->newZiLimit && 
+                        $ziCount < $this->ziLimit){
+
+                    $result['score'] = 0;
+                    $result['id'] = $id;
+                    $newList[] = $result;
                     $newZiCount++;
                     $ziCount++;
                 }
             }
         }
 
-        $this->content = [
+        $this->context = [
             'type' => Course::CLASS_STATUS_MAIN,
-            'review' => $reviewList,
-            'new' => $newList,
+            'results' => array_merge($reviewList, $newList),
+            'time' => time(),
+            'vIndex' => 0,
+            'tIndex' => 0,
+            'action' => Course::ACTION_VIEW
         ];
     }
 
@@ -500,15 +528,21 @@ class Course
         $newZiCount = 0;
 
         foreach($this->results as $id => $result){
-            if($result['l'] === 0 && $newZiCount < 20){
-                $newList[$id] = $result;
+            if($result['level'] === 0 && $newZiCount < 20){
+                $result['score'] = 0;
+                $result['id'] = $id;
+                $newList[] = $result;
                 $newZiCount++;
             }
         }
 
-        $this->content = [
+        $this->context = [
             'type' => Course::CLASS_STATUS_REVIEW,
-            'new' => $newList,
+            'results' => $newList,
+            'time' => time(),
+            'vIndex' => 0,
+            'tIndex' => 0,
+            'action' => Course::ACTION_VIEW
         ];
     }
 }

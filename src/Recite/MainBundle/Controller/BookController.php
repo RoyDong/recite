@@ -99,7 +99,7 @@ class BookController extends BaseController
         $course = $user->getCourseByBook($book);
 
         if($course){
-            $course->setStatus(Course::STATUS_CLOSE);
+            $course->close();
             return $this->renderJson([]);
         }
 
