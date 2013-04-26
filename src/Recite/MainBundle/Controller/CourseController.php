@@ -13,8 +13,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  */
 class CourseController extends BaseController {
 
-    private $groupSize = 5;
-
     /**
      * @Route("/lessons")
      */
@@ -22,11 +20,11 @@ class CourseController extends BaseController {
         $this->accessFilter(['ROLE_USER']);
         $user = $this->getUser();
         $courses = $user->getOpenedCourses();
-        $json = [];
+        $response = [];
 
         foreach($courses as $course){
             $book = $course->getBook();
-            $json[] = [
+            $response[] = [
                 'id' => $course->getId(),
                 'book' => [
                     'id' => $book->getId(),
@@ -40,7 +38,7 @@ class CourseController extends BaseController {
             ];
         }
 
-        return $this->renderJson($json);
+        return $this->renderJson($response);
     }
 
     /**
@@ -49,13 +47,17 @@ class CourseController extends BaseController {
     public function blackboardAction($cid){
         $course = $this->accessCourseFilter($cid);
         $context = $course->getContext();
-
-        $zi = $this->getData($context);
+        $result = $course->getCurrentResult();
+        $zi = $this->Zi->find($result['id']);
 
         return $this->renderJson([
             'id' => $zi->getId(),
             'char' => $zi->getChar(),
-            'action' => $context['action']
+            'vIndex' => $context['vIndex'],
+            'tIndex' => $context['tIndex'],
+            'action' => $context['action'],
+            'count' => count($context['results']),
+            'status' => $course->getClassStatus()
         ]);
     }
 
@@ -63,11 +65,14 @@ class CourseController extends BaseController {
      * @Route("/{cid}/learn",requirements={"id" = "\d+"})
      */
     public function learnAction($cid){
+        $answer = (int)$this->get('request')->get('answer', 0);
         $course = $this->accessCourseFilter($cid);
-        $context = $course->getContext();
+        $course->updateResult($answer);
+
+        return $this->renderJson(1);
     }
 
-    public function accessCourseFilter($cid){
+    private function accessCourseFilter($cid){
         $this->accessFilter(['ROLE_USER']);
         $user = $this->getUser();
         $course = $this->Course->find($cid);
@@ -77,28 +82,5 @@ class CourseController extends BaseController {
         }
 
         throw new HttpException(404, 'course not found or is not open');
-    }
-
-    private function getData($context){
-        $vIndex = $context['vIndex'];
-        $tIndex = $context['tIndex'];
-        $action = $context['action'];
-        $count = count($context['results']);
-
-        if($vIndex > $tIndex){
-            $gap = $vIndex - $tIndex;
-        }else{
-            $gap = $count - $tIndex + $vIndex;
-        }
-
-        if($action === Course::ACTION_VIEW){
-            $zid = $context['results'][$vIndex]['id'];
-        }else if($action === Course::ACTION_TEST){
-            $zid = $context['results'][$vIndex]['id'];
-        }
-
-        $zi = $this->Zi->find($zid);
-
-        return $zi;
     }
 }

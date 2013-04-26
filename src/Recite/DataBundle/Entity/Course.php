@@ -125,13 +125,24 @@ class Course
 
     private $newZiLimit = 20;
 
+    private $groupSize = 5;
+
     /**
      * 3:00 as the day day division timeline
      * 
      * @return int
      */
-    public static function dayDivisionTime($time = null){
-        return strtotime(date('Y-m-d', $time ?: time())) + 10800;
+    public static function dayStartTime($time = null){
+        return strtotime(date('Y-m-d', $time ?: time())) + 14400;
+    }
+
+    /**
+     * 3:00 as the day day division timeline
+     * 
+     * @return int
+     */
+    public static function dayEndTime($time = null){
+        return strtotime(date('Y-m-d', $time ?: time())) + 86400;
     }
 
     /**
@@ -393,6 +404,10 @@ class Course
     public function close(){
         $this->status = Course::STATUS_CLOSE;
         $this->context = null;
+        $this->beginAt = 0;
+        $this->endAt = 0;
+        $this->reviewBeginAt = 0;
+        $this->reviewEndAt = 0;
     }
 
     /**
@@ -428,9 +443,9 @@ class Course
      * @return type
      */
     public function getClassStatus(){
-        $time = Course::dayDivisionTime();
+        $time = Course::dayStartTime();
 
-        if($this->reviewEndAt > $time){
+        if(time() < $time && $this->reviewEndAt > $time){
             return Course::CLASS_STATUS_CLOSE;
         }
 
@@ -469,8 +484,172 @@ class Course
         return $this->context;
     }
 
+    public function getResultByIndex($index){
+        if(isset($this->context['results'][$index])){
+            return $this->context['results'][$index];
+        }
+
+        return null;
+    }
+
+    public function getCurrentResult($action = null){
+        if(is_null($action)){
+            $action = $this->context['action'];
+        }
+
+        if($action === Course::ACTION_VIEW){
+            return $this->context['results'][$this->context['vIndex']];
+        }
+
+        if($action === Course::ACTION_TEST){
+            return $this->context['results'][$this->context['tIndex']];
+        }
+    }
+
+    public function updateResult($answer){
+        if($this->context['action'] === Course::ACTION_VIEW){
+            $index = $this->context['vIndex'];
+            $result = $this->getResultByIndex($index);     
+
+            if($answer){
+                $result['score']++;
+            }
+
+            $this->context['vIndex']++;
+            $this->context['results'][$index] = $result;
+        }
+        else if($this->context['action'] === Course::ACTION_TEST){
+            $index = $this->context['tIndex'];
+            $result = $this->getResultByIndex($index);     
+            
+            if($answer){
+                $result['score']++;
+
+                if($result['level'] == 0 && $result['score'] >= 2){
+                    $result['level'] = 6;
+                }else{
+                    $result['level'] += $result['score'];
+                }
+
+                $result['time'] = $this->getShowTime($result['level']);
+                unset($result['score']);
+                $this->context['passed'][] = $result;
+                unset($this->context['results'][$index]);
+                $count = count($this->context['results']);
+
+                if($count == 0){
+                    return $this->finishClass();
+                }
+
+                $this->context['results'] = array_values($this->context['results']);
+
+                if($this->context['vIndex'] > $index){
+                    $this->context['vIndex']--;
+                }
+            }
+            else{
+                $result['score'] = 0;
+                $result['error']++;
+                $this->context['results'][$index] = $result;
+                $this->context['tIndex']++;
+            }
+        }
+
+        $this->updateIndexAndAction();
+        $this->updateClassStatus();
+    }
+
+    private function updateClassStatus(){
+        $classStatus = $this->getClassStatus();
+
+        if($classStatus === Course::CLASS_STATUS_OPEN){
+            $this->beginAt = time();
+        }
+        else if($classStatus === Course::CLASS_STATUS_MAIN_END){
+            $this->reviewBeginAt = time();
+        }
+    }
+
+    private function updateIndexAndAction(){
+        $count = count($this->context['results']);
+
+        if($this->context['vIndex'] >= $count){
+            $this->context['vIndex'] = 0;
+        }
+
+        if($this->context['tIndex'] >= $count){
+            $this->context['tIndex'] = 0;
+        }
+
+        if($count > $this->groupSize){
+            if($this->context['vIndex'] > $this->context['tIndex']){
+                $gap = $this->context['vIndex'] - $this->context['tIndex'];
+            }else{
+                $gap = $count - 
+                        $this->context['tIndex'] + $this->context['vIndex'];
+            }
+
+            if($gap <= $this->groupSize){
+                $this->context['action'] = Course::ACTION_VIEW;
+            }else if($gap >= 2 * $this->groupSize){
+                $this->context['action'] = Course::ACTION_TEST;
+            }
+        }
+        else if($this->context['action'] === Course::ACTION_VIEW &&
+                $this->context['vIndex'] === $this->context['tIndex']){
+
+            $this->context['action'] = Course::ACTION_TEST;
+        }
+    }
+
+    public function getShowTime($level){
+        switch($level){
+            case 1:
+                $hour = 3;
+                break;
+            case 2:
+                $hour = 24;
+                break;
+            case 3:
+                $hour = 48;
+                break;
+            case 4:
+                $hour = 168;
+                break;
+            case 5:
+                $hour = 720;
+                break;
+            default :
+                return 0;
+        }
+
+        return Course::dayStartTime() + 3600 * $hour;
+    }
+
+    public function finishClass(){
+        $classStatus = $this->getClassStatus();
+
+        if($classStatus === Course::CLASS_STATUS_MAIN){
+            $this->endAt = time();
+        }
+        else if($classStatus === Course::CLASS_STATUS_REVIEW){
+            $this->reviewEndAt = time();
+        }
+
+        foreach($this->context['passed'] as $result){
+            $this->results[$result['id']] = [
+                'level' => $result['level'],
+                'error' => $result['error'],
+                'time' => $result['time'],
+            ];
+        }
+
+        $this->lessonNo++;
+        $this->context = null;
+    }
+
     private function isContentInitialized($type = Course::CLASS_STATUS_MAIN){
-        $divisionTime = Course::dayDivisionTime();
+        $divisionTime = Course::dayStartTime();
         if(is_array($this->context) && $this->context['type'] === $type &&
                 $this->context['time'] > $divisionTime){
 
@@ -481,7 +660,7 @@ class Course
     }
 
     private function initContent(){
-        $divisionTime = Course::dayDivisionTime();
+        $divisionTime = Course::dayStartTime();
         $reviewList = [];
         $ziCount = 0;
 
@@ -516,6 +695,7 @@ class Course
         $this->context = [
             'type' => Course::CLASS_STATUS_MAIN,
             'results' => array_merge($reviewList, $newList),
+            'passed' => [], 
             'time' => time(),
             'vIndex' => 0,
             'tIndex' => 0,
@@ -539,6 +719,7 @@ class Course
         $this->context = [
             'type' => Course::CLASS_STATUS_REVIEW,
             'results' => $newList,
+            'passed' => [], 
             'time' => time(),
             'vIndex' => 0,
             'tIndex' => 0,
