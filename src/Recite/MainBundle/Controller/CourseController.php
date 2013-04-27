@@ -14,6 +14,27 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class CourseController extends BaseController {
 
     /**
+     * @Route("/{cid}",requirements={"cid"="\d+"})
+     */
+    public function showAction($cid){
+        $course = $this->accessCourseFilter($cid);
+        $context = $course->getContext();
+        $result = $course->getCurrentResult();
+        $zi = $this->Zi->find($result['id']);
+
+        return $this->renderJson([
+            'id' => $zi->getId(),
+            'char' => $zi->getChar(),
+            'results' => $course->getResults(),
+            'vIndex' => $context['vIndex'],
+            'tIndex' => $context['tIndex'],
+            'action' => $context['action'],
+            'count' => count($context['results']),
+            'status' => $course->getClassStatus()
+        ]);
+    }
+
+    /**
      * @Route("/lessons")
      */
     public function lessonsAction(){
@@ -42,7 +63,7 @@ class CourseController extends BaseController {
     }
 
     /**
-     * @Route("/{cid}/blackboard",requirements={"id" = "\d+"})
+     * @Route("/{cid}/blackboard",requirements={"cid" = "\d+"})
      */
     public function blackboardAction($cid){
         $course = $this->accessCourseFilter($cid);
@@ -62,14 +83,18 @@ class CourseController extends BaseController {
     }
 
     /**
-     * @Route("/{cid}/learn",requirements={"id" = "\d+"})
+     * @Route("/{cid}/learn",requirements={"cid" = "\d+"})
      */
     public function learnAction($cid){
         $answer = (int)$this->get('request')->get('answer', 0);
         $course = $this->accessCourseFilter($cid);
-        $course->updateResult($answer);
 
-        return $this->renderJson(1);
+        if($course->isClassAvailable()){
+            $course->updateResult($answer);
+            return $this->renderJson(1);
+        }
+        
+        throw new HttpException(403, 'you cant learn this time');
     }
 
     private function accessCourseFilter($cid){
