@@ -108,7 +108,6 @@ class Course
     private $classTime = 0;
 
     /**
-     * 记录当前课花费的时间
      *
      * @ORM\Column(name="purchase_at",type="integer")
      */
@@ -610,7 +609,7 @@ class Course
     public function getShowTime($level){
         switch($level){
             case 1:
-                $hour = 3;
+                $hour = 0;
                 break;
             case 2:
                 $hour = 24;
@@ -642,6 +641,7 @@ class Course
         }
 
         $review = [];
+        $dayStart = Course::dayStartTime();
 
         foreach($this->context['passed'] as $result){
             $this->results[$result['id']] = [
@@ -650,7 +650,7 @@ class Course
                 'time' => $result['time'],
             ];
 
-            if($result['repeat'] === 1){
+            if($result['repeat'] === 1 && $result['time'] <= $dayStart){
                 $review[] = $result;
             }
         }
@@ -691,7 +691,7 @@ class Course
 
         foreach($this->results as $id => $result){
             if($result['level'] > 0 && $result['level'] < $this->maxLevel && 
-                    $ziCount < $this->ziLimit && $result['time'] < $startTime){
+                    $ziCount < $this->ziLimit && $result['time'] <= $startTime){
 
                 $result['score'] = 0;
                 $result['id'] = $id;
