@@ -475,7 +475,7 @@ class Course
         return $status === Course::CLASS_STATUS_MAIN_OPEN ||
                 $status === Course::CLASS_STATUS_MAIN ||
                 $status === Course::CLASS_STATUS_REVIEW_OPEN ||
-                $status === COurse::CLASS_STATUS_REVIEW;
+                $status === Course::CLASS_STATUS_REVIEW;
     }
 
     public function getContext(){
@@ -686,8 +686,9 @@ class Course
 
     private function initContent(){
         $startTime = Course::dayStartTime();
-        $reviewList = [];
+        $results = [];
         $ziCount = 0;
+        $newZiCount = 0;
 
         foreach($this->results as $id => $result){
             if($result['level'] > 0 && $result['level'] < $this->maxLevel && 
@@ -695,13 +696,10 @@ class Course
 
                 $result['score'] = 0;
                 $result['id'] = $id;
-                $reviewList[] = $result;
+                $results[] = $result;
                 $ziCount++;
             }
         }
-
-        $newList = [];
-        $newZiCount = 0;
 
         if($ziCount < $this->ziLimit){
             foreach($this->results as $id => $result){
@@ -710,7 +708,7 @@ class Course
 
                     $result['score'] = 0;
                     $result['id'] = $id;
-                    $newList[] = $result;
+                    $results[] = $result;
                     $newZiCount++;
                     $ziCount++;
                 }
@@ -719,7 +717,7 @@ class Course
 
         $this->context = [
             'type' => Course::CLASS_STATUS_MAIN,
-            'results' => array_merge($reviewList, $newList),
+            'results' => $results,
             'passed' => [], 
             'time' => time(),
             'vIndex' => 0,
