@@ -75,7 +75,7 @@ class CrawlDictcnCommand extends ContainerAwareCommand
     private function call($url){
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url); 
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['User-Agent: QM beta 0.0.1']);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['User-Agent: Dongwei beta 0.0.1']);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $html = curl_exec($ch);
         curl_close($ch);
