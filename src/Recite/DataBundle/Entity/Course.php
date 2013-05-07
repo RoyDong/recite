@@ -455,11 +455,11 @@ class Course
         }
 
         if($this->endAt > $dayStart){
-            if($time > $this->endAt + 10800){
-                return Course::CLASS_STATUS_REVIEW_OPEN;
+            if($time < $this->endAt + 10800){
+                return Course::CLASS_STATUS_MAIN_END;
             }
 
-            return Course::CLASS_STATUS_MAIN_END;
+            return Course::CLASS_STATUS_REVIEW_OPEN;
         }
 
         if($this->beginAt > $dayStart){

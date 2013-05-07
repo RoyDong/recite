@@ -7,14 +7,21 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\SecurityContext;
+use Doctrien\ORM\EntityManager;
 
-class ActionListener 
-{
+class ActionListener {
+
+    /**
+     * @var SecurityContext
+     */
     private $security;
 
+    /**
+     * @var EntityManager
+     */
     private $em;
 
-    public function __construct(SecurityContext $security, \Doctrine\ORM\EntityManager $em){
+    public function __construct(SecurityContext $security, EntityManager $em){
         $this->security = $security;
         $this->em = $em;
     }
