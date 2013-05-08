@@ -21,7 +21,7 @@ class ActionListener {
      */
     private $em;
 
-    public function __construct(SecurityContext $security, EntityManager $em){
+    public function __construct(SecurityContext $security, $em){
         $this->security = $security;
         $this->em = $em;
     }

@@ -12,6 +12,17 @@ use Recite\DataBundle\Controller\BaseController;
  */
 class SecurityController extends BaseController
 {
+
+    /**
+     * @Route("/status")
+     */
+    public function statusAction(){
+        $this->getRequest()->getSession()->get(0);
+        $user = $this->getUser();
+
+        return $this->renderJson($user ? $user->getRoles() : []);
+    }
+
     public function loginAction()
     {
         $request = $this->getRequest();

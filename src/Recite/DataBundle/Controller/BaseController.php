@@ -32,11 +32,10 @@ class BaseController extends Controller
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function renderJson($data = null){
-        if (is_array($data) && 0 === count($data)) {
-            $data = new \ArrayObject();
-        }
+        $json = json_encode(
+                ['message' => 'success', 'code' => 0, 'data' => $data], 
+                JSON_UNESCAPED_UNICODE);
 
-        $json = $data ? json_encode($data, JSON_UNESCAPED_UNICODE) : '';
         $response = new Response($json);
         $response->headers->set('Content-Type', 'application/json');
 
