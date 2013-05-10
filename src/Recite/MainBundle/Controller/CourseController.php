@@ -6,7 +6,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Recite\DataBundle\Controller\BaseController;
 use Recite\DataBundle\Entity\Book;
 use Recite\DataBundle\Entity\Course;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use Recite\MainBundle\Exception\ReciteException;
 
 /**
  * @Route("/course")
@@ -94,7 +94,8 @@ class CourseController extends BaseController {
             return $this->renderJson(1);
         }
         
-        throw new HttpException(403, 'you cant learn this time');
+        throw new ReciteException(ReciteException::BAD_REQUEST, 
+                'you cant learn this time');
     }
 
     private function accessCourseFilter($cid){
@@ -106,6 +107,7 @@ class CourseController extends BaseController {
             return $course;
         }
 
-        throw new HttpException(404, 'course not found or is not open');
+        throw new ReciteException(ReciteException::BAD_REQUEST, 
+                'course not found or is not open');
     }
 }

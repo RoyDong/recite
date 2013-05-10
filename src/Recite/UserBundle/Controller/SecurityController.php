@@ -18,9 +18,12 @@ class SecurityController extends BaseController
      */
     public function statusAction(){
         $this->getRequest()->getSession()->get(0);
-        $user = $this->getUser();
 
-        return $this->renderJson($user ? $user->getRoles() : []);
+        if($this->get('security.context')->isGranted('ROLE_USER')){
+            return $this->renderJson(null, 'user');
+        }
+        
+        return $this->renderJson('anonymous');
     }
 
     public function loginAction()

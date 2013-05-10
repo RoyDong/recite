@@ -3,7 +3,7 @@
 services:
     recite.action_listener:
         class: Recite\MainBundle\Listener\ActionListener
-        arguments: ['@security.context', '@doctrine.orm.default_entity_manager']
+        arguments: ['@recite.base_controller', '@service_container']
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
             - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }

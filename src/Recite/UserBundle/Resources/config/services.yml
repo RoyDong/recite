@@ -1,5 +1,6 @@
 services:
     recite.authentication_listener:
         class: Recite\UserBundle\Listener\AuthenticationListener
+        arguments: ['@recite.base_controller', '@service_container']
 
         

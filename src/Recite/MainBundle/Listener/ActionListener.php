@@ -5,39 +5,34 @@ namespace Recite\MainBundle\Listener;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\SecurityContext;
-use Doctrien\ORM\EntityManager;
+use Recite\DataBundle\Controller\BaseController;
 
 class ActionListener {
 
-    /**
-     * @var SecurityContext
-     */
-    private $security;
+    protected $controller;
 
-    /**
-     * @var EntityManager
-     */
-    private $em;
+    protected $format;
 
-    public function __construct(SecurityContext $security, $em){
-        $this->security = $security;
-        $this->em = $em;
+    public function __construct(BaseController $baseController, $container){
+        $baseController->setContainer($container);
+        $this->controller = $baseController;
+        $this->format = $baseController->getRequest()
+                ->headers->get('Response-Format');
     }
-
 
     public function onKernelController(FilterControllerEvent $event){
 
     }
 
     public function onKernelResponse(FilterResponseEvent $event){
-        $this->em->flush();
+        $this->controller->em()->flush();
     }
 
     public function onKernelException(GetResponseForExceptionEvent $event){
-        $response = new Response($event->getException()->getMessage());
-
-        $event->setResponse($response);
+        if($this->format === 'json'){
+            $exception = $event->getException();
+            $event->setResponse($this->controller->renderJson(
+                    null, $exception->getMessage(), $exception->getCode()));
+        }
     }
 }

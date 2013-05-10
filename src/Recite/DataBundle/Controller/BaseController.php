@@ -3,8 +3,8 @@
 namespace Recite\DataBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpFoundation\Response;
+use Recite\MainBundle\Exception\ReciteException;
 
 class BaseController extends Controller
 {
@@ -23,7 +23,7 @@ class BaseController extends Controller
      * @param string $name
      * @return Doctrine\ORM\EntityManager
      */
-    protected function em($name = null){
+    public function em($name = null){
         return $this->get('doctrine')->getManager($name);
     }
 
@@ -31,9 +31,9 @@ class BaseController extends Controller
      * @param array $data
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function renderJson($data = null){
+    public function renderJson($data = null, $message = 'success', $code = 0){
         $json = json_encode(
-                ['message' => 'success', 'code' => 0, 'data' => $data], 
+                ['message' => $message, 'code' => $code, 'data' => $data], 
                 JSON_UNESCAPED_UNICODE);
 
         $response = new Response($json);
@@ -48,11 +48,11 @@ class BaseController extends Controller
      * @param string $method
      * @throws HttpException
      */
-    protected function accessFilter($roles = null, $method = null){
+    public function accessFilter($roles = null, $method = null){
         if($method && $this->get('kernel')->getEnvironment() !== 'dev' && 
                 $this->get('request')->getMethod() !== strtoupper($method)){
 
-            throw new HttpException(403, 'method is not allowed');
+            throw new ReciteException(ReciteException::METHOD_NOT_ALLOW);
         }
 
         if($roles){
@@ -62,7 +62,7 @@ class BaseController extends Controller
                 if($security->isGranted($role)) return;
             }
 
-            throw new HttpException(403, 'no permissions');
+            throw new ReciteException(ReciteException::USER_NO_PERMISSION);
         }
     }
 }

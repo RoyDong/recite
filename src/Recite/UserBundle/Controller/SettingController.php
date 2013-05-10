@@ -12,17 +12,4 @@ use Recite\DataBundle\Controller\BaseController;
  */
 class SettingController extends BaseController
 {
-    /**
-     * @Route()
-     * @Template()
-     */
-    public function indexAction()
-    {
-        $user = $this->getUser();
-
-        return [
-            'name' => $user ? $user->getUsername() : 'annoymous',
-            'roles' => $user ? $user->getRoles() : []
-        ];
-    }
 }

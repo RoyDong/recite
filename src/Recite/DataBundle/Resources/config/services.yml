@@ -1,0 +1,3 @@
+services:
+    recite.base_controller:
+        class: Recite\DataBundle\Controller\BaseController
