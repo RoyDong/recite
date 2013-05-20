@@ -97,6 +97,20 @@ class User implements UserInterface, \Serializable {
         return $roles;
     }
 
+    public function getTopRole(){
+        $roles = $this->getRoles();
+
+        if(in_array('ROLE_ADMIN', $roles)){
+            return 'admin';
+        }
+
+        if(in_array('ROLE_USER', $roles)){
+            return 'user';
+        }
+
+        return 'anonymous';
+    }
+
     /**
      * @inheritDoc
      */

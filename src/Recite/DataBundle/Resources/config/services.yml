@@ -1,3 +1,6 @@
 services:
     recite.base_controller:
         class: Recite\DataBundle\Controller\BaseController
+
+    recite.location:
+        class: Recite\DataBundle\Service\LocationService

@@ -31,8 +31,9 @@ class ActionListener {
     public function onKernelException(GetResponseForExceptionEvent $event){
         if($this->format === 'json'){
             $exception = $event->getException();
+            $code = $exception->getCode();
             $event->setResponse($this->controller->renderJson(
-                    null, $exception->getMessage(), $exception->getCode()));
+                    null, $exception->getMessage(), $code ?: 1));
         }
     }
 }
