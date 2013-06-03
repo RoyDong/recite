@@ -3,6 +3,7 @@
 namespace Recite\DataBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Recite\DataBundle\Entity\User;
 
 /**
  * BookRepository
@@ -18,5 +19,28 @@ class BookRepository extends EntityRepository
         }
 
         return $this->findOneByTitle($idOrTitle);
+    }
+
+    public function findWithUser(User $user, $page, $pageSize = 20){
+        $offset = ($page - 1) * $pageSize;
+        $sql = <<<SQL
+select b.*, c.id cid, c.uid uid from book b left join course c on c.bid = b.id
+order by b.level asc limit $offset, $pageSize 
+SQL;
+        $result = $this->getEntityManager()->getConnection()->fetchAll($sql);
+        $books = [];
+
+        foreach($result as $row){
+            $books[] = [
+                'id' => $row['id'],
+                'title' => $row['title'],
+                'description' => $row['description'],
+                'zi_count' => $row['zi_count'],
+                'level' => $row['level'],
+                'purchased' => $row['uid'] == $user->getId()
+            ];
+        }
+
+        return $books;
     }
 }

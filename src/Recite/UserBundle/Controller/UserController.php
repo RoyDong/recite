@@ -119,6 +119,6 @@ class UserController extends BaseController
         }
 
         throw new ReciteException(ReciteException::USER_NOT_FOUND, 
-                'User not found or you have not login');
+                'User not found');
     }
 }

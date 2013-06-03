@@ -12,6 +12,19 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  */
 class BookController extends BaseController
 {
+
+    /**
+     * @Route("/list")
+     */
+    public function listAction(){
+        $this->accessFilter(['ROLE_USER']);
+        $page = (int)$this->get('request')->get('page', 1);
+        $pageSize = (int)$this->get('request')->get('page_size', 20);
+        $books = $this->Book->findWithUser($this->getUser(), $page, $pageSize);
+
+        return $this->renderJson($books);
+    }
+
     /**
      * @Route("/{id}",requirements={"id" = "\d+"})
      */
@@ -28,7 +41,8 @@ class BookController extends BaseController
                 'id' => $book->getId(),
                 'title' => $book->getTitle(),
                 'descrition' => $book->getDescription(),
-                'ziCount' => $book->getZiCount()
+                'level' => $book->getLevel(),
+                'size' => $book->getZiCount()
             ]);
         }
     }
