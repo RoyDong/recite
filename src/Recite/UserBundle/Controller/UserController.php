@@ -21,7 +21,7 @@ class UserController extends BaseController
     public function SignupAction()
     {
         $request = $this->get('request');
-        $email = $request->get('email');
+        $email = trim($request->get('email'));
         $passwd = $request->get('password');
 
         if(strlen($passwd) < 6){
@@ -29,7 +29,7 @@ class UserController extends BaseController
                     'Password must more than 6 chars');
         }
 
-        if($this->get('validator')->validateValue($email, new Email)->count()){
+        if(!$email || $this->get('validator')->validateValue($email, new Email)->count()){
             throw new ReciteException(
                     ReciteException::EMAIL_FORMAT_ERROR, 'Email format error');
         }
@@ -80,6 +80,20 @@ class UserController extends BaseController
                 $this->get('security.context')->getToken());
     }
 
+    /**
+     * @Route("/signout")
+     */
+    public function signoutAction(){
+        $request = $this->get('request');
+        $request->getSession()->invalidate();
+        $response = $this->renderJson();
+
+        foreach ($request->cookies as $cookieName => $v) {
+            $response->headers->clearCookie($cookieName);
+        }
+
+        return $response;
+    }
 
     /**
      * @Route("/current")

@@ -60,7 +60,7 @@ class BookController extends BaseController
         }
 
         if($user->getCourseByBook($book)){
-            throw new HttpException(403, 'you have already purchased this book');
+            return $this->renderJson(null, 'you allready have this book');
         }
 
         $course = (new Course)->setUser($user)
@@ -73,7 +73,7 @@ class BookController extends BaseController
 
         $this->em()->persist($course);
 
-        return $this->renderJson([]);
+        return $this->renderJson();
     }
 
     /**
@@ -92,7 +92,7 @@ class BookController extends BaseController
 
         if($course){
             $course->setStatus(Course::STATUS_OPEN);
-            return $this->renderJson([]);
+            return $this->renderJson();
         }
 
         throw new HttpException(403, 'you must purchase this book first');
@@ -114,7 +114,7 @@ class BookController extends BaseController
 
         if($course){
             $course->close();
-            return $this->renderJson([]);
+            return $this->renderJson();
         }
 
         throw new HttpException(403, 'you must purchase this book first');
