@@ -24,8 +24,7 @@ class BookRepository extends EntityRepository
     public function findWithUser(User $user, $page, $pageSize = 20){
         $offset = ($page - 1) * $pageSize;
         $sql = <<<SQL
-select b.*, c.id cid, c.uid uid from book b left join course c on c.bid = b.id
-order by b.level asc limit $offset, $pageSize 
+select b.* from book b order by b.level asc limit $offset, $pageSize 
 SQL;
         $result = $this->getEntityManager()->getConnection()->fetchAll($sql);
         $books = [];
@@ -36,8 +35,7 @@ SQL;
                 'title' => $row['title'],
                 'description' => $row['description'],
                 'zi_count' => $row['zi_count'],
-                'level' => $row['level'],
-                'purchased' => $row['uid'] == $user->getId()
+                'level' => $row['level']
             ];
         }
 
